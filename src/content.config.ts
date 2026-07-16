@@ -24,6 +24,8 @@ const members = defineCollection({
     role: z.enum(["professor", "phd", "ms", "undergrad", "alumni"]),
     image: z.string().optional(),
     interests: z.string().optional(),
+    /** rough description of what they're working on right now */
+    currentResearch: z.string().optional(),
     email: z.string().optional(),
     links: z
       .object({
@@ -47,6 +49,8 @@ const publications = defineCollection({
     venue: z.string(),
     venueShort: z.string().optional(),
     year: z.number(),
+    /** true = shown in the Pre-Print section above the year groups */
+    preprint: z.boolean().default(false),
     links: z
       .object({
         paper: z.string().optional(),

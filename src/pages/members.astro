@@ -11,8 +11,9 @@ const byRole = (role: string) =>
     .sort((a, b) => a.data.order - b.data.order);
 
 const professor = byRole("professor")[0];
-const { Content: ProfessorBio } = await render(professor);
+const ProfessorBio = professor ? (await render(professor)).Content : null;
 
+// Only sections that actually have members are rendered.
 const sections = [
   { role: "phd", title: "Ph.D. Students", label: "Ph.D. Student" },
   { role: "ms", title: "M.S. Students", label: "M.S. Student" },
@@ -21,56 +22,55 @@ const sections = [
     title: "Undergraduate Researchers",
     label: "Undergraduate",
   },
-];
+].filter((section) => byRole(section.role).length > 0);
 
 const alumni = byRole("alumni");
 ---
 
 <Base title="Members">
-  <PageHeader
-    kicker="People"
-    title="Members"
-    lede="The people behind EIC Lab — faculty, graduate researchers, and undergraduate students working across AI efficiency and computing systems."
-  />
+  <PageHeader kicker="People" title="Members" />
 
   <div class="container">
     <!-- Professor -->
-    <section class="member-section" aria-labelledby="sec-professor">
-      <h2 id="sec-professor" class="section-title">Professor</h2>
+    {
+      professor && ProfessorBio && (
+        <section class="member-section" aria-labelledby="sec-professor">
+          <h2 id="sec-professor" class="section-title">
+            Professor
+          </h2>
 
-      <article class="prof card">
-        <img
-          class="prof-photo"
-          src={professor.data.image}
-          alt={`Portrait of ${professor.data.name}`}
-          width="400"
-          height="400"
-          loading="eager"
-          decoding="async"
-        />
-        <div class="prof-body">
-          <h3>{professor.data.name}</h3>
-          <p class="prof-role">Professor · Director of EIC Lab</p>
-          <div class="prof-bio">
-            <ProfessorBio />
-          </div>
-          {
-            professor.data.interests && (
-              <p class="prof-interests">
-                <strong>Research interests:</strong> {professor.data.interests}
-              </p>
-            )
-          }
-          {
-            professor.data.email && (
-              <a class="chip" href={`mailto:${professor.data.email}`}>
-                {professor.data.email}
-              </a>
-            )
-          }
-        </div>
-      </article>
-    </section>
+          <article class="prof card">
+            <img
+              class="prof-photo"
+              src={professor.data.image}
+              alt={`Portrait of ${professor.data.name}`}
+              width="400"
+              height="400"
+              loading="eager"
+              decoding="async"
+            />
+            <div class="prof-body">
+              <h3>{professor.data.name}</h3>
+              <p class="prof-role">Professor · Director of EIC Lab</p>
+              <div class="prof-bio">
+                <ProfessorBio />
+              </div>
+              {professor.data.interests && (
+                <p class="prof-interests">
+                  <strong>Research interests:</strong>{" "}
+                  {professor.data.interests}
+                </p>
+              )}
+              {professor.data.email && (
+                <a class="chip" href={`mailto:${professor.data.email}`}>
+                  {professor.data.email}
+                </a>
+              )}
+            </div>
+          </article>
+        </section>
+      )
+    }
 
     <!-- Students -->
     {
@@ -87,6 +87,8 @@ const alumni = byRole("alumni");
                 position={section.label}
                 image={member.data.image}
                 interests={member.data.interests}
+                currentResearch={member.data.currentResearch}
+                email={member.data.email}
                 links={member.data.links}
               />
             ))}
@@ -96,38 +98,42 @@ const alumni = byRole("alumni");
     }
 
     <!-- Alumni -->
-    <section class="member-section" aria-labelledby="sec-alumni">
-      <h2 id="sec-alumni" class="section-title">Alumni</h2>
-      <ul class="alumni-list card">
-        {
-          alumni.map((person) => (
-            <li class="alumni-row">
-              <span class="alumni-name">{person.data.name}</span>
-              <span class="alumni-former">{person.data.formerPosition}</span>
-              <span class="alumni-current">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                  class="arrow"
-                >
-                  <path
-                    d="M5 12h14m-6-6 6 6-6 6"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-                {person.data.current}
-              </span>
-            </li>
-          ))
-        }
-      </ul>
-    </section>
+    {
+      alumni.length > 0 && (
+        <section class="member-section" aria-labelledby="sec-alumni">
+          <h2 id="sec-alumni" class="section-title">
+            Alumni
+          </h2>
+          <ul class="alumni-list card">
+            {alumni.map((person) => (
+              <li class="alumni-row">
+                <span class="alumni-name">{person.data.name}</span>
+                <span class="alumni-former">{person.data.formerPosition}</span>
+                <span class="alumni-current">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    class="arrow"
+                  >
+                    <path
+                      d="M5 12h14m-6-6 6 6-6 6"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  {person.data.current}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
   </div>
 </Base>
 
@@ -160,19 +166,22 @@ const alumni = byRole("alumni");
   /* ---- professor ---- */
   .prof {
     display: grid;
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: auto 1fr;
+    align-items: start;
     overflow: hidden;
+    padding: clamp(1.4rem, 3vw, 2rem);
+    gap: clamp(1.4rem, 3vw, 2rem);
   }
 
+  /* always a square, never stretched */
   .prof-photo {
-    width: 100%;
-    height: 100%;
+    width: clamp(180px, 22vw, 240px);
     aspect-ratio: 1;
     object-fit: cover;
+    border-radius: var(--radius-sm);
   }
 
   .prof-body {
-    padding: clamp(1.4rem, 3vw, 2rem);
     align-self: center;
   }
 
@@ -276,11 +285,6 @@ const alumni = byRole("alumni");
 
     .prof {
       grid-template-columns: 1fr;
-    }
-
-    .prof-photo {
-      max-height: 340px;
-      aspect-ratio: auto;
     }
 
     .alumni-row {

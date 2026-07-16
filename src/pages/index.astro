@@ -2,18 +2,13 @@
 import { getCollection } from "astro:content";
 import Base from "../layouts/Base.astro";
 import Carousel from "../components/Carousel.astro";
-import ResearchIcon from "../components/ResearchIcon.astro";
 
 const news = (await getCollection("news"))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 5);
+  .slice(0, 6);
 
 const featured = (await getCollection("gallery", ({ data }) => data.featured))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-
-const teams = (await getCollection("research")).sort(
-  (a, b) => a.data.order - b.data.order
-);
 
 const fmt = (date: Date) =>
   date.toLocaleDateString("en-US", {
@@ -30,131 +25,73 @@ const slides = featured.map((item) => ({
 ---
 
 <Base>
-  <!-- News & Updates + carousel — first thing on the page -->
-  <section class="container top-section">
-    <div class="section-head">
-      <div>
-        <p class="kicker">EIC Lab · Sungkyunkwan University</p>
-        <h1>News &amp; Updates</h1>
-      </div>
-      <a class="head-link" href="/gallery/">Browse the gallery →</a>
-    </div>
+  <section class="container home">
+    <!-- Quiet one-line identity -->
+    <header class="identity">
+      <h1>Efficient &amp; Intelligent Computing Lab</h1>
+      <p class="identity-sub">Sungkyunkwan University</p>
+    </header>
 
     <div class="main-grid">
-      <ul class="news-list">
-        {
-          news.map((item) => (
-            <li class="news-item">
-              <time datetime={item.data.date.toISOString().slice(0, 10)}>
-                {fmt(item.data.date)}
-              </time>
-              <div>
-                <h3>{item.data.title}</h3>
-                <p>{item.data.description}</p>
-              </div>
-            </li>
-          ))
-        }
-      </ul>
+      <section class="news-col" aria-labelledby="news-heading">
+        <div class="col-head">
+          <h2 id="news-heading" class="kicker">News &amp; Updates</h2>
+          <a class="head-link" href="/news/">All news →</a>
+        </div>
+        <ul class="news-list">
+          {
+            news.map((item) => (
+              <li class="news-item">
+                <time
+                  class="mono"
+                  datetime={item.data.date.toISOString().slice(0, 10)}
+                >
+                  {fmt(item.data.date)}
+                </time>
+                <div>
+                  <h3>{item.data.title}</h3>
+                  <p>{item.data.description}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
 
       <div class="carousel-col">
         <Carousel slides={slides} label="Featured photos from the gallery" />
       </div>
     </div>
   </section>
-
-  <!-- Slim lab intro -->
-  <section class="about">
-    <div class="container about-inner">
-      <div>
-        <h2>Efficient &amp; Intelligent Computing</h2>
-        <p>
-          We build the algorithms, tools, and silicon that make modern AI fast
-          and efficient — spanning large language models, computer vision,
-          design automation, and computer architecture.
-        </p>
-      </div>
-      <div class="about-actions">
-        <a class="btn btn-primary" href="/research/">Explore our research</a>
-        <a class="btn btn-ghost" href="/members/">Meet the team</a>
-      </div>
-    </div>
-  </section>
-
-  <section class="container section research-strip">
-    <div class="section-head">
-      <div>
-        <p class="kicker">Research</p>
-        <h2>What we work on</h2>
-      </div>
-      <a class="head-link" href="/research/">All research areas →</a>
-    </div>
-
-    <div class="team-grid">
-      {
-        teams.map((team) => (
-          <a class="team-card card" href="/research/">
-            <ResearchIcon name={team.data.icon} />
-            <h3>{team.data.title}</h3>
-            <p>{team.data.tagline}</p>
-          </a>
-        ))
-      }
-    </div>
-  </section>
-
-  <section class="container">
-    <div class="cta card">
-      <div>
-        <h2>Interested in joining EIC Lab?</h2>
-        <p>
-          We are always looking for curious students who want to make AI
-          systems faster, smaller, and smarter.
-        </p>
-      </div>
-      <a class="btn btn-primary" href="/contact/">Get in touch</a>
-    </div>
-  </section>
 </Base>
 
 <style>
-  /* ---- top section ---- */
-  .top-section {
-    padding-block: clamp(2rem, 4.5vw, 3.25rem);
+  .home {
+    padding-block: clamp(2rem, 4.5vw, 3.5rem);
   }
 
-  .top-section h1 {
-    font-size: clamp(1.7rem, 3.5vw, 2.3rem);
-  }
-
-  /* ---- section head ---- */
-  .section-head {
+  /* ---- identity line ---- */
+  .identity {
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1.75rem;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 1rem;
+    padding-bottom: clamp(1.5rem, 3vw, 2.25rem);
+    margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
+    border-bottom: 1px solid var(--line);
   }
 
-  .section-head h1,
-  .section-head h2 {
-    margin-top: 0.5rem;
+  .identity h1 {
+    font-size: clamp(1.3rem, 2.6vw, 1.65rem);
+    font-weight: 650;
   }
 
-  .section-head h2 {
-    font-size: clamp(1.5rem, 3vw, 1.9rem);
-  }
-
-  .head-link {
-    font-size: 0.9rem;
-    font-weight: 550;
-    color: var(--ink-2);
-    white-space: nowrap;
-    padding-block: 0.4rem;
-  }
-
-  .head-link:hover {
-    color: var(--accent-strong);
+  .identity-sub {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
   }
 
   /* ---- news + carousel ---- */
@@ -163,6 +100,25 @@ const slides = featured.map((item) => ({
     grid-template-columns: 1.05fr 1fr;
     gap: clamp(2rem, 4vw, 3.5rem);
     align-items: start;
+  }
+
+  .col-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .head-link {
+    font-size: 0.88rem;
+    font-weight: 550;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+
+  .head-link:hover {
+    color: var(--accent-strong);
   }
 
   .news-list {
@@ -177,17 +133,10 @@ const slides = featured.map((item) => ({
     border-top: 1px solid var(--line);
   }
 
-  .news-item:first-child {
-    border-top: none;
-    padding-top: 0;
-  }
-
   .news-item time {
-    font-size: 0.82rem;
-    font-weight: 550;
+    font-size: 0.78rem;
     color: var(--ink-3);
-    font-variant-numeric: tabular-nums;
-    padding-top: 0.2rem;
+    padding-top: 0.25rem;
   }
 
   .news-item h3 {
@@ -203,117 +152,13 @@ const slides = featured.map((item) => ({
     color: var(--ink-2);
   }
 
-  /* ---- about band ---- */
-  .about {
-    background: var(--surface);
-    border-block: 1px solid var(--line);
-    padding-block: clamp(2.25rem, 5vw, 3.25rem);
-  }
-
-  .about-inner {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: center;
-    gap: 2rem;
-  }
-
-  .about h2 {
-    font-size: clamp(1.45rem, 3vw, 1.9rem);
-  }
-
-  .about p {
-    margin-top: 0.7rem;
-    color: var(--ink-2);
-    max-width: 58ch;
-  }
-
-  .about-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-
-  /* ---- research strip ---- */
-  .team-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.1rem;
-  }
-
-  .team-card {
-    padding: 1.4rem;
-    transition: border-color 0.15s ease;
-  }
-
-  .team-card:hover {
-    border-color: var(--accent-line);
-  }
-
-  .team-card h3 {
-    font-size: 1.1rem;
-    margin-top: 1rem;
-  }
-
-  .team-card:hover h3 {
-    color: var(--accent-strong);
-  }
-
-  .team-card p {
-    margin-top: 0.4rem;
-    font-size: 0.87rem;
-    color: var(--ink-2);
-    line-height: 1.5;
-  }
-
-  /* ---- cta ---- */
-  .cta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.5rem;
-    padding: clamp(1.75rem, 4vw, 2.5rem);
-    background: var(--accent-tint);
-    border-color: var(--accent-line);
-  }
-
-  .cta h2 {
-    font-size: clamp(1.35rem, 2.5vw, 1.65rem);
-  }
-
-  .cta p {
-    margin-top: 0.4rem;
-    color: var(--ink-2);
-    max-width: 48ch;
-  }
-
-  /* ---- responsive ---- */
-  @media (max-width: 980px) {
-    .team-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
   @media (max-width: 860px) {
-    /* news first, carousel below, full width */
     .main-grid {
       grid-template-columns: 1fr;
-    }
-
-    .about-inner {
-      grid-template-columns: 1fr;
-    }
-
-    .cta {
-      flex-direction: column;
-      align-items: flex-start;
     }
   }
 
   @media (max-width: 560px) {
-    .team-grid {
-      grid-template-columns: 1fr;
-    }
-
     .news-item {
       grid-template-columns: 1fr;
       gap: 0.2rem;

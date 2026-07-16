@@ -4,6 +4,8 @@ interface Props {
   position: string;
   image?: string;
   interests?: string;
+  currentResearch?: string;
+  email?: string;
   links?: {
     about?: string;
     website?: string;
@@ -11,125 +13,131 @@ interface Props {
   };
 }
 
-const { name, position, image, interests, links = {} } = Astro.props;
+const {
+  name,
+  position,
+  image,
+  interests,
+  currentResearch,
+  email,
+  links = {},
+} = Astro.props;
+
+const photo = image ?? "/images/members/placeholder.svg";
 
 const linkItems = [
-  { key: "about", label: "About", href: links.about },
-  { key: "website", label: "Website", href: links.website },
-  { key: "scholar", label: "Scholar", href: links.scholar },
+  { label: "About", href: links.about },
+  { label: "Website", href: links.website },
+  { label: "Scholar", href: links.scholar },
 ].filter((item) => item.href);
 ---
 
-<article class="member-card card">
-  <div class="photo">
-    <img
-      src={image ?? "/images/members/placeholder.svg"}
-      alt={`Portrait of ${name}`}
-      width="400"
-      height="400"
-      loading="lazy"
-      decoding="async"
-    />
-    {
-      linkItems.length > 0 && (
-        <div class="links" aria-label={`Links for ${name}`}>
-          {linkItems.map((item) => (
-            <a class="link-pill" href={item.href}>
-              {item.label}
-            </a>
-          ))}
-        </div>
-      )
-    }
-  </div>
+<article class="member-card card" data-member>
+  <img
+    class="photo"
+    src={photo}
+    alt={`Portrait of ${name}`}
+    width="400"
+    height="400"
+    loading="lazy"
+    decoding="async"
+  />
   <div class="body">
-    <h3>{name}</h3>
+    <h3>
+      <!-- stretched button: clicking anywhere on the card opens the dialog -->
+      <button class="open" type="button" data-open aria-haspopup="dialog">
+        {name}
+      </button>
+    </h3>
     <p class="position">{position}</p>
     {interests && <p class="interests">{interests}</p>}
+    {email && <a class="email mono" href={`mailto:${email}`}>{email}</a>}
   </div>
+
+  <dialog class="member-dialog" aria-label={`About ${name}`}>
+    <div class="dialog-body">
+      <button class="close" type="button" data-close aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M6 6l12 12M18 6L6 18"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"></path>
+        </svg>
+      </button>
+
+      <img
+        class="dialog-photo"
+        src={photo}
+        alt=""
+        width="400"
+        height="400"
+        loading="lazy"
+        decoding="async"
+      />
+
+      <div class="dialog-info">
+        <h3>{name}</h3>
+        <p class="position">{position}</p>
+
+        {
+          currentResearch && (
+            <>
+              <p class="label">Current research</p>
+              <p class="value">{currentResearch}</p>
+            </>
+          )
+        }
+        {
+          interests && (
+            <>
+              <p class="label">Interests</p>
+              <p class="value">{interests}</p>
+            </>
+          )
+        }
+        {
+          email && (
+            <>
+              <p class="label">Email</p>
+              <a class="email mono" href={`mailto:${email}`}>
+                {email}
+              </a>
+            </>
+          )
+        }
+
+        {
+          linkItems.length > 0 && (
+            <div class="links">
+              {linkItems.map((item) => (
+                <a class="chip" href={item.href}>
+                  {item.label}
+                </a>
+              ))}
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </dialog>
 </article>
 
 <style>
   .member-card {
+    position: relative;
     overflow: hidden;
     transition: border-color 0.15s ease;
   }
 
   .member-card:hover {
-    border-color: var(--line-strong);
+    border-color: var(--accent-line);
   }
 
   .photo {
-    position: relative;
-  }
-
-  .photo img {
     width: 100%;
     aspect-ratio: 1;
     object-fit: cover;
-  }
-
-  .links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    padding: 0.7rem 0.85rem;
-    background: var(--surface);
-    border-bottom: 1px solid var(--line);
-  }
-
-  .link-pill {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.42rem 0.8rem;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    font-size: 0.8rem;
-    font-weight: 550;
-    color: var(--ink-2);
-    background: var(--surface);
-    transition: border-color 0.15s ease, color 0.15s ease,
-      background-color 0.15s ease;
-  }
-
-  .link-pill:hover {
-    border-color: var(--accent-line);
-    background: var(--accent-tint);
-    color: var(--accent-strong);
-  }
-
-  /* On hover-capable devices, tuck the links into an overlay that
-     reveals on hover or keyboard focus. */
-  @media (hover: hover) and (pointer: fine) {
-    .links {
-      position: absolute;
-      inset-inline: 0;
-      bottom: 0;
-      justify-content: center;
-      background: var(--scrim);
-      border-bottom: none;
-      opacity: 0;
-      transform: translateY(6px);
-      transition: opacity 0.18s ease, transform 0.18s ease;
-    }
-
-    .member-card:hover .links,
-    .member-card:focus-within .links {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .link-pill {
-      background: rgba(255, 255, 255, 0.12);
-      border-color: rgba(255, 255, 255, 0.35);
-      color: #fff;
-    }
-
-    .link-pill:hover {
-      background: #fff;
-      border-color: #fff;
-      color: var(--ink);
-    }
   }
 
   .body {
@@ -137,14 +145,34 @@ const linkItems = [
   }
 
   h3 {
-    font-size: 1.18rem;
+    font-size: 1.15rem;
+  }
+
+  .open {
+    font: inherit;
+    letter-spacing: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  /* stretch the name button over the whole card */
+  .open::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+  }
+
+  .member-card:hover .open {
+    color: var(--accent-strong);
   }
 
   .position {
     margin-top: 0.2rem;
-    font-size: 0.8rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
     font-weight: 600;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--accent);
   }
@@ -155,4 +183,132 @@ const linkItems = [
     color: var(--ink-2);
     line-height: 1.5;
   }
+
+  .email {
+    position: relative; /* keep clickable above the stretched button */
+    z-index: 1;
+    display: inline-block;
+    margin-top: 0.55rem;
+    font-size: 0.78rem;
+    color: var(--ink-2);
+    overflow-wrap: anywhere;
+  }
+
+  .email:hover {
+    color: var(--accent-strong);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* ---- dialog ---- */
+  .member-dialog {
+    border: none;
+    padding: 0;
+    border-radius: var(--radius);
+    max-width: min(560px, calc(100vw - 2rem));
+    width: 100%;
+    box-shadow: 0 24px 60px rgb(15 20 30 / 0.25);
+  }
+
+  .member-dialog::backdrop {
+    background: rgba(20, 24, 31, 0.55);
+  }
+
+  .dialog-body {
+    position: relative;
+    display: grid;
+    grid-template-columns: 168px 1fr;
+    gap: 1.4rem;
+    padding: clamp(1.25rem, 3vw, 1.75rem);
+  }
+
+  .close {
+    position: absolute;
+    top: 0.7rem;
+    right: 0.7rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    color: var(--ink-2);
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+
+  .close:hover {
+    background: var(--surface-2);
+    color: var(--ink);
+  }
+
+  .dialog-photo {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+  }
+
+  .dialog-info h3 {
+    font-size: 1.3rem;
+    padding-right: 2.25rem;
+  }
+
+  .label {
+    margin-top: 0.95rem;
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .value {
+    margin-top: 0.2rem;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+
+  .dialog-info .email {
+    margin-top: 0.2rem;
+    font-size: 0.85rem;
+    color: var(--accent-strong);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 1.1rem;
+  }
+
+  @media (max-width: 520px) {
+    .dialog-body {
+      grid-template-columns: 1fr;
+    }
+
+    .dialog-photo {
+      width: min(100%, 180px);
+    }
+  }
 </style>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-member]").forEach((card) => {
+    const dialog = card.querySelector("dialog");
+    if (!dialog) return;
+
+    card
+      .querySelector("[data-open]")
+      ?.addEventListener("click", () => dialog.showModal());
+    dialog
+      .querySelector("[data-close]")
+      ?.addEventListener("click", () => dialog.close());
+    // click on the backdrop closes (the padded body swallows inner clicks)
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+  });
+</script>

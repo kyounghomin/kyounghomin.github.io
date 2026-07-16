@@ -3,9 +3,9 @@ const nav = [
   { href: "/", label: "Home" },
   { href: "/members/", label: "Members" },
   { href: "/research/", label: "Research" },
-  { href: "/gallery/", label: "Gallery" },
   { href: "/publications/", label: "Publications" },
-  { href: "/contact/", label: "Contact" },
+  { href: "/news/", label: "News" },
+  { href: "/gallery/", label: "Gallery" },
 ];
 
 const path = Astro.url.pathname;
@@ -36,7 +36,9 @@ const isActive = (href: string) =>
           <rect x="720" y="490" width="330" height="100"></rect>
         </g>
       </svg>
-      <span class="brand-name">EIC<span class="brand-lab">&nbsp;Lab</span></span>
+      <span class="brand-name"
+        >EIC Lab<span class="brand-lab">&nbsp;@ SKKU</span></span
+      >
     </a>
 
     <nav class="site-nav" id="site-nav" aria-label="Main">

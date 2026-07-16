@@ -1,7 +1,6 @@
 ---
 name: Jinheon Choi
 role: phd
-image: /images/members/yerin-cho.svg
 interests: Efficient video understanding, token pruning
 currentResearch: Temporal token merging for long-video transformers
 email: yerin.cho@skku.edu

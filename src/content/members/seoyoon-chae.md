@@ -1,5 +1,5 @@
 ---
 name: Seoyoon Chae
-role: ms
+role: undergrad
 order: 99
 ---

@@ -1,10 +1,10 @@
 ---
-name: "Soyul Han"
-role: undergrad
-image: "/images/members/soyul-han.svg"
-interests: "Deep learning systems"
-currentResearch: "Profiling KV-cache memory behavior in LLM serving"
-email: "soyul.han@skku.edu"
+name: Kanghyun Noh
+role: phd
+image: /images/members/soyul-han.svg
+interests: Efficient AI, LLM Compression
+currentResearch: Profiling KV-cache memory behavior in LLM serving
+email: kanghyun.noh at skku.edu
 links:
   about: "#"
   website: "#"

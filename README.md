@@ -13,7 +13,16 @@ The official website of **EIC Lab** (Efficient & Intelligent Computing Laborator
 
 ## Editing content
 
-All site content lives in `src/content/` as plain Markdown files with frontmatter — one file per item. **To add an item, drop a new `.md` file into the matching folder. To remove one, delete the file.** This structure is ready for a git-based CMS (Decap, Sveltia, etc.).
+Pages CMS provides the visual content editor. Open
+[`www.kyounghomin.com/admin/`](https://www.kyounghomin.com/admin/) and use an
+authorized GitHub account. The editor is configured by `.pages.yml`; setup,
+publishing, media, access, and recovery instructions are in
+[`docs/CMS.md`](docs/CMS.md).
+
+All site content remains in `src/content/` as plain Markdown files with
+frontmatter, one file per item. To edit manually, add, update, or remove the
+matching `.md` file. CMS saves create normal Git commits and trigger the same
+GitHub Pages deployment workflow.
 
 ### News — `src/content/news/`
 

@@ -1,0 +1,241 @@
+---
+import "@fontsource-variable/inter";
+import "../styles/global.css";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Content Studio | EIC Lab</title>
+    <meta
+      name="description"
+      content="Content administration gateway for the EIC Lab website."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <main class="admin-shell">
+      <header class="admin-header">
+        <a class="brand" href="/" aria-label="EIC Lab home">
+          <img src="/logo.svg" alt="" width="116" height="40" />
+          <span>EIC Lab</span>
+        </a>
+      </header>
+
+      <section class="admin-content" aria-labelledby="admin-title">
+        <p class="kicker">Content administration</p>
+        <h1 id="admin-title">EIC Lab Content Studio</h1>
+        <p class="lede">
+          Manage news, gallery images, members, publications, and research
+          content with an authorized GitHub account.
+        </p>
+
+        <div class="admin-actions">
+          <a
+            class="primary-action"
+            href="https://app.pagescms.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Open content manager
+          </a>
+          <a
+            class="secondary-action"
+            href="https://github.com/kyounghomin/kyounghomin.github.io/actions/workflows/deploy.yml"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Deployment status
+          </a>
+        </div>
+
+        <dl class="admin-meta">
+          <div>
+            <dt>Repository</dt>
+            <dd>kyounghomin/kyounghomin.github.io</dd>
+          </div>
+          <div>
+            <dt>Branch</dt>
+            <dd>main</dd>
+          </div>
+          <div>
+            <dt>Publishing</dt>
+            <dd>Automatic after save</dd>
+          </div>
+        </dl>
+      </section>
+
+      <footer class="admin-footer">
+        <a href="/">Return to website</a>
+        <span>GitHub authorization required</span>
+      </footer>
+    </main>
+  </body>
+</html>
+
+<style>
+  body {
+    min-height: 100vh;
+    background: var(--surface);
+  }
+
+  .admin-shell {
+    display: grid;
+    width: min(100% - 2.5rem, 1040px);
+    min-height: 100vh;
+    margin-inline: auto;
+    grid-template-rows: auto 1fr auto;
+  }
+
+  .admin-header,
+  .admin-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding-block: 1.5rem;
+  }
+
+  .admin-header {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 1rem;
+    font-weight: 650;
+  }
+
+  .brand img {
+    width: 70px;
+  }
+
+  .admin-content {
+    align-self: center;
+    max-width: 720px;
+    padding-block: clamp(4rem, 12vh, 8rem);
+  }
+
+  .admin-content h1 {
+    margin-top: 0.8rem;
+    font-size: clamp(2rem, 6vw, 3.75rem);
+    letter-spacing: 0;
+  }
+
+  .admin-content .lede {
+    margin-top: 1.25rem;
+    max-width: 58ch;
+    color: var(--ink-2);
+    font-size: clamp(1rem, 2vw, 1.14rem);
+  }
+
+  .admin-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  .primary-action,
+  .secondary-action {
+    display: inline-flex;
+    min-height: 46px;
+    align-items: center;
+    justify-content: center;
+    padding: 0.7rem 1.15rem;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    transition: background-color 0.15s ease, border-color 0.15s ease,
+      color 0.15s ease;
+  }
+
+  .primary-action {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .primary-action:hover {
+    border-color: var(--accent-strong);
+    background: var(--accent-strong);
+  }
+
+  .secondary-action {
+    border-color: var(--line-strong);
+    background: var(--surface);
+    color: var(--ink-2);
+  }
+
+  .secondary-action:hover {
+    border-color: var(--accent-line);
+    background: var(--accent-tint);
+    color: var(--accent-strong);
+  }
+
+  .admin-meta {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+    margin-top: clamp(3.5rem, 8vw, 5.5rem);
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .admin-meta dt {
+    color: var(--ink-3);
+    font-size: 0.72rem;
+    font-weight: 650;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .admin-meta dd {
+    margin: 0.35rem 0 0;
+    overflow-wrap: anywhere;
+    color: var(--ink-2);
+    font-size: 0.88rem;
+  }
+
+  .admin-footer {
+    border-top: 1px solid var(--line);
+    color: var(--ink-3);
+    font-size: 0.82rem;
+  }
+
+  .admin-footer a:hover {
+    color: var(--accent-strong);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @media (max-width: 620px) {
+    .admin-shell {
+      width: min(100% - 2rem, 1040px);
+    }
+
+    .admin-content {
+      padding-block: 3.5rem;
+    }
+
+    .admin-actions {
+      display: grid;
+    }
+
+    .admin-meta {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .admin-footer {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+  }
+</style>

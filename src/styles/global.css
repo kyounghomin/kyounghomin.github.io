@@ -4,14 +4,14 @@
 
 :root {
   /* palette — from the EIC Lab logo: navy #00265F + charcoal #303438 */
-  --bg: #f8f9fb;
+  --bg: #edf0f4;
   --surface: #ffffff;
-  --surface-2: #eff1f4;
+  --surface-2: #e4e8ee;
   --ink: #24272b;
   --ink-2: #52565c;
   --ink-3: #82878f;
-  --line: #e4e6e9;
-  --line-strong: #d2d5da;
+  --line: #dde0e5;
+  --line-strong: #c8ccd3;
   --accent: #00265f;
   --accent-strong: #001b45;
   --accent-tint: #ebf0f7;

@@ -1,34 +1,41 @@
 ---
 import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
 import Base from "../layouts/Base.astro";
 import PageHeader from "../components/PageHeader.astro";
 
 const pubs = await getCollection("publications");
 
-const preprints = pubs
-  .filter((p) => p.data.preprint)
-  .sort((a, b) => b.data.year - a.data.year || a.data.order - b.data.order);
+const years = [...new Set(pubs.map((p) => p.data.year))].sort((a, b) => b - a);
 
-const published = pubs.filter((p) => !p.data.preprint);
-const years = [...new Set(published.map((p) => p.data.year))].sort(
-  (a, b) => b - a
-);
-const byYear = (year: number) =>
-  published
-    .filter((p) => p.data.year === year)
-    .sort((a, b) => a.data.order - b.data.order);
+// ponytail: type derived from venue text; add a schema field if it ever guesses wrong
+const typeOf = (pub: CollectionEntry<"publications">) =>
+  pub.data.preprint
+    ? "Preprint"
+    : /journal|transactions|magazine/i.test(pub.data.venue)
+      ? "Journal"
+      : "Conference";
 
-const linkLabels: Record<string, string> = {
-  paper: "paper",
-  code: "code",
-  project: "project",
-  doi: "doi",
+const sections = ["Conference", "Journal", "Preprint"];
+
+const groupsFor = (year: number) => {
+  const inYear = pubs.filter((p) => p.data.year === year);
+  return sections
+    .map((label) => ({
+      label,
+      items: inYear
+        .filter((p) => typeOf(p) === label)
+        .sort((a, b) => a.data.order - b.data.order),
+    }))
+    .filter((section) => section.items.length > 0);
 };
 
-const groups = [
-  ...(preprints.length ? [{ label: "Pre-Print", items: preprints }] : []),
-  ...years.map((year) => ({ label: String(year), items: byYear(year) })),
-];
+const linkLabels: Record<string, string> = {
+  paper: "Paper",
+  code: "Code",
+  project: "Project page",
+  doi: "DOI",
+};
 ---
 
 <Base title="Publications">
@@ -36,39 +43,53 @@ const groups = [
 
   <div class="container section">
     {
-      groups.map((group) => (
-        <section
-          class="year-group"
-          aria-labelledby={`group-${group.label.toLowerCase()}`}
-        >
-          <h2 id={`group-${group.label.toLowerCase()}`} class="year mono">
-            {group.label}
+      years.map((year) => (
+        <section class="year-group" aria-labelledby={`year-${year}`}>
+          <h2 id={`year-${year}`} class="year mono">
+            {year}
           </h2>
-          <ul class="pub-list">
-            {group.items.map((pub) => (
-              <li class="pub">
-                <p class="ref">
-                  <span class="authors">{pub.data.authors}.</span>{" "}
-                  <span class="title">“{pub.data.title}.”</span>{" "}
-                  <span class="venue">
-                    {pub.data.venue}, {pub.data.year}.
-                  </span>
-                  {pub.data.venueShort && (
-                    <span class="venue-tag mono">{pub.data.venueShort}</span>
-                  )}
-                </p>
-                {Object.values(pub.data.links).some(Boolean) && (
-                  <p class="pub-links mono">
-                    {Object.entries(pub.data.links)
-                      .filter(([, href]) => href)
-                      .map(([key, href]) => (
-                        <a href={href}>[{linkLabels[key] ?? key}]</a>
-                      ))}
-                  </p>
-                )}
-              </li>
+          <div class="year-body">
+            {groupsFor(year).map((section) => (
+              <section class="type-group" aria-label={`${section.label}, ${year}`}>
+                <h3 class="type-label kicker">{section.label}</h3>
+                <ul class="pub-list">
+                  {section.items.map((pub) => (
+                    <li class="pub">
+                      <p class="ref">
+                        <span class="authors">{pub.data.authors}.</span>{" "}
+                        <span class="title">“{pub.data.title}.”</span>{" "}
+                        <span class="venue">
+                          {pub.data.venue}, {pub.data.year}.
+                        </span>
+                        {pub.data.venueShort && (
+                          <span
+                            class:list={[
+                              "venue-tag",
+                              "mono",
+                              { arxiv: pub.data.preprint },
+                            ]}
+                          >
+                            {pub.data.venueShort}
+                          </span>
+                        )}
+                      </p>
+                      {Object.values(pub.data.links).some(Boolean) && (
+                        <div class="pub-links">
+                          {Object.entries(pub.data.links)
+                            .filter(([, href]) => href)
+                            .map(([key, href]) => (
+                              <a class="chip" href={href}>
+                                {linkLabels[key] ?? key}
+                              </a>
+                            ))}
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </section>
             ))}
-          </ul>
+          </div>
         </section>
       ))
     }
@@ -96,9 +117,18 @@ const groups = [
     line-height: 1.4;
   }
 
+  .year-body {
+    display: grid;
+    gap: 1.6rem;
+  }
+
+  .type-label {
+    margin-bottom: 0.75rem;
+  }
+
   .pub-list {
     display: grid;
-    gap: 1.1rem;
+    gap: 1.35rem;
   }
 
   .pub .ref {
@@ -116,12 +146,17 @@ const groups = [
     color: var(--ink);
   }
 
+  .venue {
+    font-style: italic;
+  }
+
   .venue-tag {
     display: inline-block;
     margin-left: 0.5rem;
     font-size: 0.7rem;
     font-weight: 600;
     letter-spacing: 0.04em;
+    font-style: normal;
     color: var(--accent-strong);
     background: var(--accent-tint);
     border: 1px solid var(--accent-line);
@@ -131,21 +166,18 @@ const groups = [
     vertical-align: 0.08em;
   }
 
+  /* arXiv preprints stand out from conference tags by color */
+  .venue-tag.arxiv {
+    color: #9c1c1c;
+    background: #fdf0ef;
+    border-color: #efd0cd;
+  }
+
   .pub-links {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.9rem;
-    margin-top: 0.25rem;
-    font-size: 0.78rem;
-  }
-
-  .pub-links a {
-    color: var(--accent-strong);
-  }
-
-  .pub-links a:hover {
-    text-decoration: underline;
-    text-underline-offset: 3px;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
   }
 
   @media (max-width: 700px) {

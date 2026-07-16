@@ -14,20 +14,28 @@ const rendered = await Promise.all(
     Content: (await render(team)).Content,
   }))
 );
+
+/* one muted accent per topic — used for the top border, icon, and tagline */
+const colors: Record<string, string> = {
+  llm: "#3b5ba5",
+  vision: "#2f7d6d",
+  eda: "#96682f",
+  arch: "#7d4b8f",
+};
 ---
 
 <Base title="Research">
-  <PageHeader
-    kicker="Research"
-    title="Research Areas"
-    lede="EIC Lab is organized into four teams that share one goal: making intelligent systems dramatically more efficient, from the model down to the transistor."
-  />
+  <PageHeader kicker="Research" title="Research Areas" />
 
   <div class="container section">
     <div class="team-grid">
       {
         rendered.map(({ team, Content }) => (
-          <article class="team card" id={team.id}>
+          <article
+            class="team card"
+            id={team.id}
+            style={`--team-color: ${colors[team.id] ?? "var(--accent)"}`}
+          >
             <div class="team-head">
               <ResearchIcon name={team.data.icon} />
               <div>
@@ -55,7 +63,9 @@ const rendered = await Promise.all(
   }
 
   .team {
+    --tile-color: var(--team-color);
     padding: clamp(1.5rem, 3vw, 2rem);
+    border-top: 3px solid var(--team-color);
   }
 
   .team-head {
@@ -65,18 +75,18 @@ const rendered = await Promise.all(
   }
 
   .team-head h2 {
-    font-size: 1.45rem;
+    font-size: 1.35rem;
   }
 
   .tagline {
     margin-top: 0.35rem;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     font-weight: 550;
-    color: var(--accent-strong);
+    color: var(--team-color);
   }
 
   .team-body {
-    margin-top: 1.1rem;
+    margin-top: 1rem;
     color: var(--ink-2);
     font-size: 0.94rem;
     line-height: 1.65;

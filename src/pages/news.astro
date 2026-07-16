@@ -1,0 +1,124 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../layouts/Base.astro";
+import PageHeader from "../components/PageHeader.astro";
+
+const news = (await getCollection("news")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+const years = [...new Set(news.map((item) => item.data.date.getFullYear()))];
+
+const byYear = (year: number) =>
+  news.filter((item) => item.data.date.getFullYear() === year);
+
+const fmt = (date: Date) =>
+  date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+---
+
+<Base title="News">
+  <PageHeader kicker="EIC Lab" title="News &amp; Updates" />
+
+  <div class="container section">
+    {
+      years.map((year) => (
+        <section class="year-group" aria-labelledby={`year-${year}`}>
+          <h2 id={`year-${year}`} class="year mono">
+            {year}
+          </h2>
+          <ul class="news-list">
+            {byYear(year).map((item) => (
+              <li class="news-item">
+                <time
+                  class="mono"
+                  datetime={item.data.date.toISOString().slice(0, 10)}
+                >
+                  {fmt(item.data.date)}
+                </time>
+                <div>
+                  <h3>{item.data.title}</h3>
+                  <p>{item.data.description}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+</Base>
+
+<style>
+  .year-group {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 1rem 2rem;
+    align-items: start;
+  }
+
+  .year-group + .year-group {
+    margin-top: 2.25rem;
+    padding-top: 2.25rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .year {
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+  }
+
+  .news-list {
+    display: grid;
+  }
+
+  .news-item {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    gap: 1rem;
+    padding-block: 1rem;
+  }
+
+  .news-item:first-child {
+    padding-top: 0.15rem;
+  }
+
+  .news-item + .news-item {
+    border-top: 1px solid var(--line);
+  }
+
+  .news-item time {
+    font-size: 0.78rem;
+    color: var(--ink-3);
+    padding-top: 0.25rem;
+    white-space: nowrap;
+  }
+
+  .news-item h3 {
+    font-size: 1rem;
+    font-weight: 620;
+    letter-spacing: 0;
+    line-height: 1.4;
+  }
+
+  .news-item p {
+    margin-top: 0.3rem;
+    font-size: 0.9rem;
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 700px) {
+    .year-group {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .news-item {
+      grid-template-columns: 1fr;
+      gap: 0.2rem;
+    }
+  }
+</style>

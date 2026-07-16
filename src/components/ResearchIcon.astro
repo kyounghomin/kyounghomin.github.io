@@ -55,9 +55,10 @@ const { name, size = 24 } = Astro.props;
     width: 46px;
     height: 46px;
     border-radius: 12px;
-    background: var(--accent-tint);
-    border: 1px solid var(--accent-line);
-    color: var(--accent-strong);
+    background: color-mix(in srgb, var(--tile-color, var(--accent)) 9%, #fff);
+    border: 1px solid
+      color-mix(in srgb, var(--tile-color, var(--accent)) 28%, #fff);
+    color: var(--tile-color, var(--accent-strong));
     flex: none;
   }
 </style>

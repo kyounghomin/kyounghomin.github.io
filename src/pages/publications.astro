@@ -5,58 +5,66 @@ import PageHeader from "../components/PageHeader.astro";
 
 const pubs = await getCollection("publications");
 
-const years = [...new Set(pubs.map((p) => p.data.year))].sort((a, b) => b - a);
+const preprints = pubs
+  .filter((p) => p.data.preprint)
+  .sort((a, b) => b.data.year - a.data.year || a.data.order - b.data.order);
 
+const published = pubs.filter((p) => !p.data.preprint);
+const years = [...new Set(published.map((p) => p.data.year))].sort(
+  (a, b) => b - a
+);
 const byYear = (year: number) =>
-  pubs
+  published
     .filter((p) => p.data.year === year)
     .sort((a, b) => a.data.order - b.data.order);
 
 const linkLabels: Record<string, string> = {
-  paper: "Paper",
-  code: "Code",
-  project: "Project Page",
-  doi: "DOI",
+  paper: "paper",
+  code: "code",
+  project: "project",
+  doi: "doi",
 };
+
+const groups = [
+  ...(preprints.length ? [{ label: "Pre-Print", items: preprints }] : []),
+  ...years.map((year) => ({ label: String(year), items: byYear(year) })),
+];
 ---
 
 <Base title="Publications">
-  <PageHeader
-    kicker="Publications"
-    title="Publications"
-    lede="Peer-reviewed papers from EIC Lab, most recent first."
-  />
+  <PageHeader kicker="Publications" title="Publications" />
 
   <div class="container section">
     {
-      years.map((year) => (
-        <section class="year-group" aria-labelledby={`year-${year}`}>
-          <h2 id={`year-${year}`} class="year">
-            {year}
+      groups.map((group) => (
+        <section
+          class="year-group"
+          aria-labelledby={`group-${group.label.toLowerCase()}`}
+        >
+          <h2 id={`group-${group.label.toLowerCase()}`} class="year mono">
+            {group.label}
           </h2>
           <ul class="pub-list">
-            {byYear(year).map((pub) => (
+            {group.items.map((pub) => (
               <li class="pub">
-                <h3 class="pub-title">{pub.data.title}</h3>
-                <p class="pub-authors">{pub.data.authors}</p>
-                <p class="pub-venue">
-                  <em>{pub.data.venue}</em>
+                <p class="ref">
+                  <span class="authors">{pub.data.authors}.</span>{" "}
+                  <span class="title">“{pub.data.title}.”</span>{" "}
+                  <span class="venue">
+                    {pub.data.venue}, {pub.data.year}.
+                  </span>
                   {pub.data.venueShort && (
-                    <span class="venue-tag">
-                      {pub.data.venueShort} {pub.data.year}
-                    </span>
+                    <span class="venue-tag mono">{pub.data.venueShort}</span>
                   )}
                 </p>
                 {Object.values(pub.data.links).some(Boolean) && (
-                  <div class="pub-links">
+                  <p class="pub-links mono">
                     {Object.entries(pub.data.links)
                       .filter(([, href]) => href)
                       .map(([key, href]) => (
-                        <a class="chip" href={href}>
-                          {linkLabels[key] ?? key}
-                        </a>
+                        <a href={href}>[{linkLabels[key] ?? key}]</a>
                       ))}
-                  </div>
+                  </p>
                 )}
               </li>
             ))}
@@ -76,87 +84,74 @@ const linkLabels: Record<string, string> = {
   }
 
   .year-group + .year-group {
-    margin-top: 2.5rem;
-    padding-top: 2.5rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
     border-top: 1px solid var(--line);
   }
 
   .year {
-    font-size: clamp(1.7rem, 3vw, 2.1rem);
-    color: var(--ink);
-    line-height: 1;
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1.4;
   }
 
   .pub-list {
     display: grid;
+    gap: 1.1rem;
   }
 
-  .pub {
-    padding-block: 1.35rem;
-  }
-
-  .pub:first-child {
-    padding-top: 0.35rem;
-  }
-
-  .pub + .pub {
-    border-top: 1px solid var(--line);
-  }
-
-  .pub-title {
-    font-size: 1.22rem;
-    font-weight: 600;
-    line-height: 1.3;
-  }
-
-  .pub-authors {
-    margin-top: 0.4rem;
-    font-size: 0.92rem;
-    color: var(--ink-2);
-  }
-
-  .pub-venue {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.6rem;
-    margin-top: 0.35rem;
+  .pub .ref {
     font-size: 0.95rem;
+    line-height: 1.6;
     color: var(--ink-2);
   }
 
-  .pub-venue em {
-    font-family: var(--serif);
-    font-size: 1.02rem;
+  .authors {
+    color: var(--ink-2);
+  }
+
+  .title {
+    font-weight: 620;
+    color: var(--ink);
   }
 
   .venue-tag {
-    font-size: 0.74rem;
-    font-weight: 650;
+    display: inline-block;
+    margin-left: 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 600;
     letter-spacing: 0.04em;
     color: var(--accent-strong);
     background: var(--accent-tint);
     border: 1px solid var(--accent-line);
-    border-radius: 999px;
-    padding: 0.12rem 0.6rem;
+    border-radius: 4px;
+    padding: 0.06rem 0.4rem;
     white-space: nowrap;
+    vertical-align: 0.08em;
   }
 
   .pub-links {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.45rem;
-    margin-top: 0.8rem;
+    gap: 0.9rem;
+    margin-top: 0.25rem;
+    font-size: 0.78rem;
+  }
+
+  .pub-links a {
+    color: var(--accent-strong);
+  }
+
+  .pub-links a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   @media (max-width: 700px) {
     .year-group {
       grid-template-columns: 1fr;
-      gap: 1.1rem;
-    }
-
-    .year {
-      padding-bottom: 0.35rem;
+      gap: 0.9rem;
     }
   }
 </style>

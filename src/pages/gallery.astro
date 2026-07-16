@@ -18,11 +18,7 @@ const fmt = (date: Date) =>
 ---
 
 <Base title="Gallery">
-  <PageHeader
-    kicker="Gallery"
-    title="Life at EIC Lab"
-    lede="Conferences, workshops, group photos, and everything in between. Featured photos also appear in the carousel on the home page."
-  />
+  <PageHeader kicker="Gallery" title="Life at EIC Lab" />
 
   <div class="container section">
     <div class="filters" role="group" aria-label="Filter photos by category">
@@ -63,7 +59,7 @@ const fmt = (date: Date) =>
                 </time>
                 · {item.data.category}
                 {item.data.featured && (
-                  <span class="featured">★ Featured</span>
+                  <span class="featured">Featured</span>
                 )}
               </span>
             </figcaption>

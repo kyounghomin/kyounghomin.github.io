@@ -166,22 +166,21 @@ const alumni = byRole("alumni");
   /* ---- professor ---- */
   .prof {
     display: grid;
-    grid-template-columns: auto 1fr;
-    align-items: start;
+    grid-template-columns: 240px 1fr;
     overflow: hidden;
-    padding: clamp(1.4rem, 3vw, 2rem);
-    gap: clamp(1.4rem, 3vw, 2rem);
   }
 
-  /* always a square, never stretched */
+  /* photo fills its column edge-to-edge; the card's radius rounds the
+     outer corners and the text column starts at a straight line */
   .prof-photo {
-    width: clamp(180px, 22vw, 240px);
+    width: 100%;
+    height: 100%;
     aspect-ratio: 1;
     object-fit: cover;
-    border-radius: var(--radius-sm);
   }
 
   .prof-body {
+    padding: clamp(1.4rem, 3vw, 2rem);
     align-self: center;
   }
 

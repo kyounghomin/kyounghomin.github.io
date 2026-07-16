@@ -10,6 +10,15 @@ const year = new Date().getFullYear();
         <div class="details">
           <div class="col">
             <p class="footer-head">University</p>
+            <img
+              class="skku-emblem"
+              src="/skku_logo.jpg"
+              alt="Sungkyunkwan University emblem"
+              width="600"
+              height="600"
+              loading="lazy"
+              decoding="async"
+            />
             <p class="muted">
               Sungkyunkwan University<br />
               College of Information &amp; Communication Engineering<br />
@@ -91,6 +100,15 @@ const year = new Date().getFullYear();
     text-transform: uppercase;
     color: var(--ink-3);
     margin-bottom: 0.75rem;
+  }
+
+  .skku-emblem {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: #fff;
+    margin-bottom: 0.9rem;
   }
 
   .muted {

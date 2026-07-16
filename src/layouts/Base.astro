@@ -7,11 +7,13 @@ import Footer from "../components/Footer.astro";
 interface Props {
   title?: string;
   description?: string;
+  noindex?: boolean;
 }
 
 const {
   title,
   description = "EIC Lab at Sungkyunkwan University — research on efficient and intelligent computing across large language models, computer vision, design automation, and computer architecture.",
+  noindex = false,
 } = Astro.props;
 
 const pageTitle = title ? `${title} · EIC Lab` : "EIC Lab · Sungkyunkwan University";
@@ -25,6 +27,7 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site) : undefin
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     {canonical && <link rel="canonical" href={canonical} />}
     <meta property="og:type" content="website" />

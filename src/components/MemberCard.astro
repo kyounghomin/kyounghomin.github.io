@@ -33,15 +33,27 @@ const linkItems = [
 ---
 
 <article class="member-card card" data-member>
-  <img
-    class="photo"
-    src={photo}
-    alt={`Portrait of ${name}`}
-    width="400"
-    height="400"
-    loading="lazy"
-    decoding="async"
-  />
+  <div class="photo">
+    <img
+      src={photo}
+      alt={`Portrait of ${name}`}
+      width="400"
+      height="400"
+      loading="lazy"
+      decoding="async"
+    />
+    {
+      linkItems.length > 0 && (
+        <div class="photo-links" aria-label={`Links for ${name}`}>
+          {linkItems.map((item) => (
+            <a class="link-pill" href={item.href}>
+              {item.label}
+            </a>
+          ))}
+        </div>
+      )
+    }
+  </div>
   <div class="body">
     <h3>
       <!-- stretched button: clicking anywhere on the card opens the dialog -->
@@ -51,7 +63,7 @@ const linkItems = [
     </h3>
     <p class="position">{position}</p>
     {interests && <p class="interests">{interests}</p>}
-    {email && <a class="email mono" href={`mailto:${email}`}>{email}</a>}
+    {email && <a class="chip email" href={`mailto:${email}`}>{email}</a>}
   </div>
 
   <dialog class="member-dialog" aria-label={`About ${name}`}>
@@ -100,7 +112,7 @@ const linkItems = [
           email && (
             <>
               <p class="label">Email</p>
-              <a class="email mono" href={`mailto:${email}`}>
+              <a class="chip email" href={`mailto:${email}`}>
                 {email}
               </a>
             </>
@@ -135,9 +147,79 @@ const linkItems = [
   }
 
   .photo {
+    position: relative;
+  }
+
+  .photo img {
     width: 100%;
     aspect-ratio: 1;
     object-fit: cover;
+  }
+
+  /* keep the pills clickable above the stretched name button */
+  .photo-links {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    padding: 0.7rem 0.85rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .link-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.42rem 0.8rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 550;
+    color: var(--ink-2);
+    background: var(--surface);
+    transition: border-color 0.15s ease, color 0.15s ease,
+      background-color 0.15s ease;
+  }
+
+  .link-pill:hover {
+    border-color: var(--accent-line);
+    background: var(--accent-tint);
+    color: var(--accent-strong);
+  }
+
+  /* On hover-capable devices, tuck the links into an overlay that
+     reveals on hover or keyboard focus. */
+  @media (hover: hover) and (pointer: fine) {
+    .photo-links {
+      position: absolute;
+      inset-inline: 0;
+      bottom: 0;
+      justify-content: center;
+      background: var(--scrim);
+      border-bottom: none;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+
+    .member-card:hover .photo-links,
+    .member-card:focus-within .photo-links {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .link-pill {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.35);
+      color: #fff;
+    }
+
+    .link-pill:hover {
+      background: #fff;
+      border-color: #fff;
+      color: var(--ink);
+    }
   }
 
   .body {
@@ -187,17 +269,9 @@ const linkItems = [
   .email {
     position: relative; /* keep clickable above the stretched button */
     z-index: 1;
-    display: inline-block;
-    margin-top: 0.55rem;
-    font-size: 0.78rem;
-    color: var(--ink-2);
-    overflow-wrap: anywhere;
-  }
-
-  .email:hover {
-    color: var(--accent-strong);
-    text-decoration: underline;
-    text-underline-offset: 3px;
+    margin-top: 0.65rem;
+    font-family: var(--mono);
+    font-size: 0.74rem;
   }
 
   /* ---- dialog ---- */
@@ -272,9 +346,7 @@ const linkItems = [
   }
 
   .dialog-info .email {
-    margin-top: 0.2rem;
-    font-size: 0.85rem;
-    color: var(--accent-strong);
+    margin-top: 0.45rem;
   }
 
   .links {

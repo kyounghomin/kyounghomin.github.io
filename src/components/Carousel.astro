@@ -194,6 +194,7 @@ const { slides, label = "Photo highlights" } = Astro.props;
 </style>
 
 <script>
+  const AUTOPLAY_DELAY = 3000;
   const reduceMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)"
   ).matches;
@@ -219,14 +220,59 @@ const { slides, label = "Photo highlights" } = Astro.props;
       });
     };
 
+    let autoplayTimer: number | undefined;
+
+    const stopAutoplay = () => {
+      if (autoplayTimer === undefined) return;
+      window.clearInterval(autoplayTimer);
+      autoplayTimer = undefined;
+    };
+
+    const startAutoplay = () => {
+      stopAutoplay();
+      if (
+        count < 2 ||
+        reduceMotion ||
+        document.hidden ||
+        root.matches(":hover") ||
+        root.contains(document.activeElement)
+      )
+        return;
+
+      autoplayTimer = window.setInterval(
+        () => goTo(current() + 1),
+        AUTOPLAY_DELAY
+      );
+    };
+
     root
       .querySelector("[data-prev]")
-      ?.addEventListener("click", () => goTo(current() - 1));
+      ?.addEventListener("click", () => {
+        goTo(current() - 1);
+        startAutoplay();
+      });
     root
       .querySelector("[data-next]")
-      ?.addEventListener("click", () => goTo(current() + 1));
+      ?.addEventListener("click", () => {
+        goTo(current() + 1);
+        startAutoplay();
+      });
 
-    dots.forEach((dot, i) => dot.addEventListener("click", () => goTo(i)));
+    dots.forEach((dot, i) =>
+      dot.addEventListener("click", () => {
+        goTo(i);
+        startAutoplay();
+      })
+    );
+
+    root.addEventListener("pointerenter", stopAutoplay);
+    root.addEventListener("pointerleave", startAutoplay);
+    root.addEventListener("focusin", stopAutoplay);
+    root.addEventListener("focusout", startAutoplay);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) stopAutoplay();
+      else startAutoplay();
+    });
 
     let raf = 0;
     track.addEventListener(
@@ -242,5 +288,7 @@ const { slides, label = "Photo highlights" } = Astro.props;
       },
       { passive: true }
     );
+
+    startAutoplay();
   });
 </script>

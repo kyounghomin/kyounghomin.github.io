@@ -1,43 +1,115 @@
-# Chirpy Starter
+# EIC Lab Website
 
-[![Gem Version](https://img.shields.io/gem/v/jekyll-theme-chirpy)][gem]&nbsp;
-[![GitHub license](https://img.shields.io/github/license/cotes2020/chirpy-starter.svg?color=blue)][mit]
+The official website of **EIC Lab** (Efficient & Intelligent Computing Laboratory) at Sungkyunkwan University, built with [Astro](https://astro.build) and deployed to GitHub Pages at [www.kyounghomin.com](https://www.kyounghomin.com).
 
-When installing the [**Chirpy**][chirpy] theme through [RubyGems.org][gem], Jekyll can only read files in the folders
-`_data`, `_layouts`, `_includes`, `_sass` and `assets`, as well as a small part of options of the `_config.yml` file
-from the theme's gem. If you have ever installed this theme gem, you can use the command
-`bundle info --path jekyll-theme-chirpy` to locate these files.
+## Commands
 
-The Jekyll team claims that this is to leave the ball in the user’s court, but this also results in users not being
-able to enjoy the out-of-the-box experience when using feature-rich themes.
+| Command           | Action                                       |
+| :---------------- | :------------------------------------------- |
+| `npm install`     | Install dependencies                         |
+| `npm run dev`     | Start local dev server at `localhost:4321`   |
+| `npm run build`   | Build the production site to `./dist/`       |
+| `npm run preview` | Preview the production build locally         |
 
-To fully use all the features of **Chirpy**, you need to copy the other critical files from the theme's gem to your
-Jekyll site. The following is a list of targets:
+## Editing content
 
-```shell
-.
-├── _config.yml
-├── _plugins
-├── _tabs
-└── index.html
+All site content lives in `src/content/` as plain Markdown files with frontmatter — one file per item. **To add an item, drop a new `.md` file into the matching folder. To remove one, delete the file.** This structure is ready for a git-based CMS (Decap, Sveltia, etc.).
+
+### News — `src/content/news/`
+
+Shown on the home page (5 most recent).
+
+```yaml
+---
+title: "Paper accepted to ICCAD 2026"
+date: 2026-07-02
+description: "One or two sentences shown under the title."
+---
 ```
 
-To save you time, and also in case you lose some files while copying, we extract those files/configurations of the
-latest version of the **Chirpy** theme and the [CD][CD] workflow to here, so that you can start writing in minutes.
+### Members — `src/content/members/`
 
-## Usage
+```yaml
+---
+name: "Minjun Park"
+role: phd            # professor | phd | ms | undergrad | alumni
+image: "/images/members/minjun-park.svg"
+interests: "LLM quantization, efficient inference systems"
+links:               # shown on hover (desktop) / as buttons (mobile)
+  about: "#"
+  website: "#"
+  scholar: "#"
+order: 1             # sort position within the role section
+---
+```
 
-Check out the [theme's docs](https://github.com/cotes2020/jekyll-theme-chirpy/wiki).
+Alumni entries skip `image`/`links` and use these instead:
 
-## Contributing
+```yaml
+role: alumni
+formerPosition: "M.S. Student (2023–2025)"
+current: "Engineer, Samsung Electronics — Memory Division"
+```
 
-This repository is automatically updated with new releases from the theme repository. If you encounter any issues or want to contribute to its improvement, please visit the [theme repository][chirpy] to provide feedback.
+The professor's Markdown body (below the frontmatter) is rendered as a short bio.
 
-## License
+### Publications — `src/content/publications/`
 
-This work is published under [MIT][mit] License.
+Grouped by `year` (newest first), sorted by `order` within a year.
 
-[gem]: https://rubygems.org/gems/jekyll-theme-chirpy
-[chirpy]: https://github.com/cotes2020/jekyll-theme-chirpy/
-[CD]: https://en.wikipedia.org/wiki/Continuous_deployment
-[mit]: https://github.com/cotes2020/chirpy-starter/blob/master/LICENSE
+```yaml
+---
+title: "Paper title"
+authors: "First Author, Second Author, and Yulwha Kim"
+venue: "Design Automation Conference"
+venueShort: "DAC"    # small tag next to the venue
+year: 2026
+links:               # all optional — omit any you don't have
+  paper: "#"
+  code: "#"
+  project: "#"
+  doi: "#"
+order: 1
+---
+```
+
+### Gallery — `src/content/gallery/`
+
+```yaml
+---
+title: "Spring Group Photo 2026"
+image: "/images/gallery/group-photo-2026.svg"
+category: "Group Photo"   # free text; filters are generated automatically
+date: 2026-04-10
+featured: true            # featured photos appear in the home page carousel
+---
+```
+
+### Research teams — `src/content/research/`
+
+The Markdown body is the team description (currently Lorem Ipsum placeholder).
+
+```yaml
+---
+title: "Large Language Models"
+icon: llm            # llm | vision | eda | arch
+tagline: "One-line summary shown on cards."
+order: 1
+---
+```
+
+## Images
+
+Static images live in `public/images/` (`members/`, `gallery/`). Current images are generated SVG placeholders — replace them with real photos (any format) and update the `image:` paths. Member photos display square (1:1); gallery photos display 4:3.
+
+## Design
+
+Colors, fonts, spacing, and shared styles are defined as CSS custom properties in [`src/styles/global.css`](src/styles/global.css). The palette derives from the lab logo (`public/logo.svg`): navy `#00265F` + charcoal `#303438`. Typography: Newsreader (headings) + Inter (body), self-hosted via Fontsource.
+
+Placeholder details to update when known: footer/contact email, phone, and room number.
+
+## Deployment
+
+Pushing to `main` triggers `.github/workflows/deploy.yml`, which builds the site and deploys it to GitHub Pages.
+
+**One-time setup:** in the GitHub repo, go to *Settings → Pages* and set **Source** to **GitHub Actions**. The custom domain is set by `public/CNAME` (`www.kyounghomin.com`).

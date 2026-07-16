@@ -1,0 +1,158 @@
+---
+interface Props {
+  name: string;
+  position: string;
+  image?: string;
+  interests?: string;
+  links?: {
+    about?: string;
+    website?: string;
+    scholar?: string;
+  };
+}
+
+const { name, position, image, interests, links = {} } = Astro.props;
+
+const linkItems = [
+  { key: "about", label: "About", href: links.about },
+  { key: "website", label: "Website", href: links.website },
+  { key: "scholar", label: "Scholar", href: links.scholar },
+].filter((item) => item.href);
+---
+
+<article class="member-card card">
+  <div class="photo">
+    <img
+      src={image ?? "/images/members/placeholder.svg"}
+      alt={`Portrait of ${name}`}
+      width="400"
+      height="400"
+      loading="lazy"
+      decoding="async"
+    />
+    {
+      linkItems.length > 0 && (
+        <div class="links" aria-label={`Links for ${name}`}>
+          {linkItems.map((item) => (
+            <a class="link-pill" href={item.href}>
+              {item.label}
+            </a>
+          ))}
+        </div>
+      )
+    }
+  </div>
+  <div class="body">
+    <h3>{name}</h3>
+    <p class="position">{position}</p>
+    {interests && <p class="interests">{interests}</p>}
+  </div>
+</article>
+
+<style>
+  .member-card {
+    overflow: hidden;
+    transition: border-color 0.15s ease;
+  }
+
+  .member-card:hover {
+    border-color: var(--line-strong);
+  }
+
+  .photo {
+    position: relative;
+  }
+
+  .photo img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    padding: 0.7rem 0.85rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .link-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.42rem 0.8rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 550;
+    color: var(--ink-2);
+    background: var(--surface);
+    transition: border-color 0.15s ease, color 0.15s ease,
+      background-color 0.15s ease;
+  }
+
+  .link-pill:hover {
+    border-color: var(--accent-line);
+    background: var(--accent-tint);
+    color: var(--accent-strong);
+  }
+
+  /* On hover-capable devices, tuck the links into an overlay that
+     reveals on hover or keyboard focus. */
+  @media (hover: hover) and (pointer: fine) {
+    .links {
+      position: absolute;
+      inset-inline: 0;
+      bottom: 0;
+      justify-content: center;
+      background: var(--scrim);
+      border-bottom: none;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+
+    .member-card:hover .links,
+    .member-card:focus-within .links {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .link-pill {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.35);
+      color: #fff;
+    }
+
+    .link-pill:hover {
+      background: #fff;
+      border-color: #fff;
+      color: var(--ink);
+    }
+  }
+
+  .body {
+    padding: 1rem 1.1rem 1.15rem;
+  }
+
+  h3 {
+    font-size: 1.18rem;
+  }
+
+  .position {
+    margin-top: 0.2rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .interests {
+    margin-top: 0.5rem;
+    font-size: 0.88rem;
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+</style>

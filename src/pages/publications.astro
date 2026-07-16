@@ -1,0 +1,162 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../layouts/Base.astro";
+import PageHeader from "../components/PageHeader.astro";
+
+const pubs = await getCollection("publications");
+
+const years = [...new Set(pubs.map((p) => p.data.year))].sort((a, b) => b - a);
+
+const byYear = (year: number) =>
+  pubs
+    .filter((p) => p.data.year === year)
+    .sort((a, b) => a.data.order - b.data.order);
+
+const linkLabels: Record<string, string> = {
+  paper: "Paper",
+  code: "Code",
+  project: "Project Page",
+  doi: "DOI",
+};
+---
+
+<Base title="Publications">
+  <PageHeader
+    kicker="Publications"
+    title="Publications"
+    lede="Peer-reviewed papers from EIC Lab, most recent first."
+  />
+
+  <div class="container section">
+    {
+      years.map((year) => (
+        <section class="year-group" aria-labelledby={`year-${year}`}>
+          <h2 id={`year-${year}`} class="year">
+            {year}
+          </h2>
+          <ul class="pub-list">
+            {byYear(year).map((pub) => (
+              <li class="pub">
+                <h3 class="pub-title">{pub.data.title}</h3>
+                <p class="pub-authors">{pub.data.authors}</p>
+                <p class="pub-venue">
+                  <em>{pub.data.venue}</em>
+                  {pub.data.venueShort && (
+                    <span class="venue-tag">
+                      {pub.data.venueShort} {pub.data.year}
+                    </span>
+                  )}
+                </p>
+                {Object.values(pub.data.links).some(Boolean) && (
+                  <div class="pub-links">
+                    {Object.entries(pub.data.links)
+                      .filter(([, href]) => href)
+                      .map(([key, href]) => (
+                        <a class="chip" href={href}>
+                          {linkLabels[key] ?? key}
+                        </a>
+                      ))}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+</Base>
+
+<style>
+  .year-group {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 1rem 2rem;
+    align-items: start;
+  }
+
+  .year-group + .year-group {
+    margin-top: 2.5rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .year {
+    font-size: clamp(1.7rem, 3vw, 2.1rem);
+    color: var(--ink);
+    line-height: 1;
+  }
+
+  .pub-list {
+    display: grid;
+  }
+
+  .pub {
+    padding-block: 1.35rem;
+  }
+
+  .pub:first-child {
+    padding-top: 0.35rem;
+  }
+
+  .pub + .pub {
+    border-top: 1px solid var(--line);
+  }
+
+  .pub-title {
+    font-size: 1.22rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .pub-authors {
+    margin-top: 0.4rem;
+    font-size: 0.92rem;
+    color: var(--ink-2);
+  }
+
+  .pub-venue {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 0.35rem;
+    font-size: 0.95rem;
+    color: var(--ink-2);
+  }
+
+  .pub-venue em {
+    font-family: var(--serif);
+    font-size: 1.02rem;
+  }
+
+  .venue-tag {
+    font-size: 0.74rem;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    color: var(--accent-strong);
+    background: var(--accent-tint);
+    border: 1px solid var(--accent-line);
+    border-radius: 999px;
+    padding: 0.12rem 0.6rem;
+    white-space: nowrap;
+  }
+
+  .pub-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 0.8rem;
+  }
+
+  @media (max-width: 700px) {
+    .year-group {
+      grid-template-columns: 1fr;
+      gap: 1.1rem;
+    }
+
+    .year {
+      padding-bottom: 0.35rem;
+    }
+  }
+</style>

@@ -1,0 +1,105 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="cols">
+      <div class="col brand-col">
+        <p class="footer-brand">EIC Lab</p>
+        <p class="muted">
+          Efficient &amp; Intelligent Computing Laboratory. We study how to
+          make modern AI systems faster, smaller, and smarter — from
+          algorithms to silicon.
+        </p>
+      </div>
+
+      <div class="col">
+        <p class="footer-head">University</p>
+        <p class="muted">
+          Sungkyunkwan University<br />
+          College of Information &amp; Communication Engineering<br />
+          2066 Seobu-ro, Jangan-gu, Suwon<br />
+          Gyeonggi-do 16419, Republic of Korea
+        </p>
+      </div>
+
+      <div class="col">
+        <p class="footer-head">Contact</p>
+        <ul class="contact-list">
+          <li><a href="mailto:eiclab@skku.edu">eiclab@skku.edu</a></li>
+          <li>+82-31-290-0000</li>
+          <li>Engineering Building 2, Room 27314</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="bottom">
+      <p>© {year} EIC Lab, Sungkyunkwan University. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: clamp(3rem, 7vw, 5rem);
+    border-top: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .cols {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 2.5rem;
+    padding-block: clamp(2.25rem, 5vw, 3.25rem);
+  }
+
+  .footer-brand {
+    font-size: 1.12rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.6rem;
+  }
+
+  .footer-head {
+    font-size: 0.72rem;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 0.75rem;
+  }
+
+  .muted {
+    color: var(--ink-2);
+    font-size: 0.92rem;
+    max-width: 38ch;
+  }
+
+  .contact-list {
+    display: grid;
+    gap: 0.35rem;
+    color: var(--ink-2);
+    font-size: 0.92rem;
+  }
+
+  .contact-list a:hover {
+    color: var(--accent-strong);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .bottom {
+    border-top: 1px solid var(--line);
+    padding-block: 1.25rem;
+    font-size: 0.85rem;
+    color: var(--ink-3);
+  }
+
+  @media (max-width: 860px) {
+    .cols {
+      grid-template-columns: 1fr;
+      gap: 1.75rem;
+    }
+  }
+</style>

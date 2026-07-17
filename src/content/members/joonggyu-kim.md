@@ -1,6 +1,6 @@
 ---
-name: "Joongyu Kim"
+name: "Joonggyu Kim"
 role: ms
 track: "SSIT"
-order: 3
+order: 4
 ---

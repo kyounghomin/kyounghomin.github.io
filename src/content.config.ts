@@ -14,6 +14,7 @@ const news = defineCollection({
     title: z.string(),
     date: z.coerce.date(),
     description: z.string(),
+    images: z.array(z.string()).default([]),
   }),
 });
 
@@ -21,11 +22,15 @@ const members = defineCollection({
   loader: glob({ pattern: "**/[^_]*.md", base: "./src/content/members" }),
   schema: z.object({
     name: z.string(),
-    role: z.enum(["professor", "phd", "ms", "undergrad", "alumni"]),
+    role: z.enum(["professor", "phd", "msphd", "ms", "undergrad", "alumni"]),
+    /** program/track note shown after the position, e.g. "SSIT" */
+    track: z.string().optional(),
     image: z.string().optional(),
     interests: z.string().optional(),
     /** rough description of what they're working on right now */
     currentResearch: z.string().optional(),
+    /** free-form publication entries shown in the member pop-up */
+    publications: z.array(z.string()).default([]),
     email: z.string().optional(),
     links: z
       .object({
@@ -67,7 +72,12 @@ const gallery = defineCollection({
   loader: glob({ pattern: "**/[^_]*.md", base: "./src/content/gallery" }),
   schema: z.object({
     title: z.string(),
+    /** main/cover image — shown in the grid and the home carousel */
     image: z.string(),
+    /** extra photos for the event: repo uploads */
+    images: z.array(z.string()).default([]),
+    /** extra photos for the event: external URLs (saves repo storage) */
+    imageLinks: z.array(z.string()).default([]),
     category: z.string(),
     date: z.coerce.date(),
     featured: z.boolean().default(false),

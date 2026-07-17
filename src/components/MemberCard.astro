@@ -2,9 +2,11 @@
 interface Props {
   name: string;
   position: string;
+  track?: string;
   image?: string;
   interests?: string;
   currentResearch?: string;
+  publications?: string[];
   email?: string;
   links?: {
     about?: string;
@@ -16,17 +18,22 @@ interface Props {
 const {
   name,
   position,
+  track,
   image,
   interests,
   currentResearch,
+  publications = [],
   email,
   links = {},
 } = Astro.props;
 
 const photo = image ?? "/images/members/placeholder.svg";
+const dialogId = `member-dialog-${name
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, "-")
+  .replace(/^-|-$/g, "")}`;
 
-const linkItems = [
-  { label: "About", href: links.about },
+const externalLinks = [
   { label: "Website", href: links.website },
   { label: "Scholar", href: links.scholar },
 ].filter((item) => item.href);
@@ -42,31 +49,45 @@ const linkItems = [
       loading="lazy"
       decoding="async"
     />
-    {
-      linkItems.length > 0 && (
-        <div class="photo-links" aria-label={`Links for ${name}`}>
-          {linkItems.map((item) => (
-            <a class="link-pill" href={item.href}>
-              {item.label}
-            </a>
-          ))}
-        </div>
-      )
-    }
+    <div class="photo-links" role="group" aria-label={`Actions for ${name}`}>
+      <button
+        class="link-pill"
+        type="button"
+        data-open
+        aria-haspopup="dialog"
+        aria-controls={dialogId}
+        aria-label={`About ${name}`}
+      >
+        About
+      </button>
+      {
+        externalLinks.map((item) => (
+          <a class="link-pill" href={item.href}>
+            {item.label}
+          </a>
+        ))
+      }
+    </div>
   </div>
   <div class="body">
     <h3>
       <!-- stretched button: clicking anywhere on the card opens the dialog -->
-      <button class="open" type="button" data-open aria-haspopup="dialog">
+      <button
+        class="open"
+        type="button"
+        data-open
+        aria-haspopup="dialog"
+        aria-controls={dialogId}
+      >
         {name}
       </button>
     </h3>
-    <p class="position">{position}</p>
+    <p class="position">{position}{track && ` · ${track}`}</p>
     {interests && <p class="interests">{interests}</p>}
-    {email && <a class="chip email" href={`mailto:${email}`}>{email}</a>}
+    {email && <a class="email" href={`mailto:${email}`}>{email}</a>}
   </div>
 
-  <dialog class="member-dialog" aria-label={`About ${name}`}>
+  <dialog id={dialogId} class="member-dialog" aria-label={`About ${name}`}>
     <div class="dialog-body">
       <button class="close" type="button" data-close aria-label="Close">
         <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
@@ -78,19 +99,23 @@ const linkItems = [
         </svg>
       </button>
 
-      <img
-        class="dialog-photo"
-        src={photo}
-        alt=""
-        width="400"
-        height="400"
-        loading="lazy"
-        decoding="async"
-      />
+      <div class="dialog-head">
+        <img
+          class="dialog-photo"
+          src={photo}
+          alt=""
+          width="400"
+          height="400"
+          loading="lazy"
+          decoding="async"
+        />
+        <div class="dialog-title">
+          <h3>{name}</h3>
+          <p class="position">{position}{track && ` · ${track}`}</p>
+        </div>
+      </div>
 
       <div class="dialog-info">
-        <h3>{name}</h3>
-        <p class="position">{position}</p>
 
         {
           currentResearch && (
@@ -109,10 +134,22 @@ const linkItems = [
           )
         }
         {
+          publications.length > 0 && (
+            <>
+              <p class="label">Publications</p>
+              <ul class="pub-list">
+                {publications.map((pub) => (
+                  <li>{pub}</li>
+                ))}
+              </ul>
+            </>
+          )
+        }
+        {
           email && (
             <>
               <p class="label">Email</p>
-              <a class="chip email" href={`mailto:${email}`}>
+              <a class="email-link" href={`mailto:${email}`}>
                 {email}
               </a>
             </>
@@ -120,9 +157,9 @@ const linkItems = [
         }
 
         {
-          linkItems.length > 0 && (
+          externalLinks.length > 0 && (
             <div class="links">
-              {linkItems.map((item) => (
+              {externalLinks.map((item) => (
                 <a class="chip" href={item.href}>
                   {item.label}
                 </a>
@@ -138,6 +175,8 @@ const linkItems = [
 <style>
   .member-card {
     position: relative;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     transition: border-color 0.15s ease;
   }
@@ -154,6 +193,12 @@ const linkItems = [
     width: 100%;
     aspect-ratio: 1;
     object-fit: cover;
+    transition: filter 0.2s ease;
+  }
+
+  .member-card:hover .photo > img,
+  .member-card:focus-within .photo > img {
+    filter: brightness(0.86);
   }
 
   /* keep the pills clickable above the stretched name button */
@@ -222,7 +267,13 @@ const linkItems = [
     }
   }
 
+  /* flex column with the email pinned to the bottom, so name / position /
+     interests / email share one left edge and line up across a card row */
   .body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     padding: 1rem 1.1rem 1.15rem;
   }
 
@@ -269,9 +320,17 @@ const linkItems = [
   .email {
     position: relative; /* keep clickable above the stretched button */
     z-index: 1;
-    margin-top: 0.65rem;
+    margin-top: auto;
+    padding-top: 0.8rem;
     font-family: var(--mono);
     font-size: 0.74rem;
+    color: var(--ink-2);
+  }
+
+  .email:hover {
+    color: var(--accent-strong);
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   /* ---- dialog ---- */
@@ -280,7 +339,9 @@ const linkItems = [
     padding: 0;
     border-radius: var(--radius);
     max-width: min(560px, calc(100vw - 2rem));
+    max-height: calc(100dvh - 2rem);
     width: 100%;
+    overflow-y: auto;
     box-shadow: 0 24px 60px rgb(15 20 30 / 0.25);
   }
 
@@ -290,10 +351,16 @@ const linkItems = [
 
   .dialog-body {
     position: relative;
-    display: grid;
-    grid-template-columns: 168px 1fr;
-    gap: 1.4rem;
-    padding: clamp(1.25rem, 3vw, 1.75rem);
+    padding: clamp(1.4rem, 3vw, 1.9rem);
+  }
+
+  /* compact avatar beside the name; content runs full-width below */
+  .dialog-head {
+    display: flex;
+    align-items: center;
+    gap: 1.15rem;
+    padding-bottom: 1.15rem;
+    border-bottom: 1px solid var(--line);
   }
 
   .close {
@@ -307,6 +374,7 @@ const linkItems = [
     height: 38px;
     border-radius: 999px;
     color: var(--ink-2);
+    background: var(--surface);
     cursor: pointer;
     transition: background-color 0.15s ease, color 0.15s ease;
   }
@@ -317,19 +385,21 @@ const linkItems = [
   }
 
   .dialog-photo {
-    width: 100%;
+    width: 108px;
     aspect-ratio: 1;
+    height: auto;
+    flex: none;
     object-fit: cover;
     border-radius: var(--radius-sm);
   }
 
-  .dialog-info h3 {
-    font-size: 1.3rem;
+  .dialog-title h3 {
+    font-size: 1.4rem;
     padding-right: 2.25rem;
   }
 
   .label {
-    margin-top: 0.95rem;
+    margin-top: 1.05rem;
     font-family: var(--mono);
     font-size: 0.66rem;
     font-weight: 600;
@@ -340,13 +410,44 @@ const linkItems = [
 
   .value {
     margin-top: 0.2rem;
-    font-size: 0.92rem;
+    font-size: 0.94rem;
     line-height: 1.55;
     color: var(--ink);
   }
 
-  .dialog-info .email {
-    margin-top: 0.45rem;
+  .email-link {
+    display: inline-block;
+    margin-top: 0.2rem;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--accent);
+  }
+
+  .email-link:hover {
+    color: var(--accent-strong);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .pub-list {
+    margin-top: 0.3rem;
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .pub-list li {
+    position: relative;
+    padding-left: 1em;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .pub-list li::before {
+    content: "–";
+    position: absolute;
+    left: 0;
+    color: var(--ink-3);
   }
 
   .links {
@@ -357,12 +458,8 @@ const linkItems = [
   }
 
   @media (max-width: 520px) {
-    .dialog-body {
-      grid-template-columns: 1fr;
-    }
-
     .dialog-photo {
-      width: min(100%, 180px);
+      width: 84px;
     }
   }
 </style>
@@ -372,9 +469,9 @@ const linkItems = [
     const dialog = card.querySelector("dialog");
     if (!dialog) return;
 
-    card
-      .querySelector("[data-open]")
-      ?.addEventListener("click", () => dialog.showModal());
+    card.querySelectorAll<HTMLElement>("[data-open]").forEach((trigger) => {
+      trigger.addEventListener("click", () => dialog.showModal());
+    });
     dialog
       .querySelector("[data-close]")
       ?.addEventListener("click", () => dialog.close());

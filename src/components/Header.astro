@@ -89,16 +89,17 @@ const isActive = (href: string) =>
     position: sticky;
     top: 0;
     z-index: 50;
-    background: var(--bg);
+    background: var(--surface);
     border-bottom: 1px solid var(--line);
+    box-shadow: 0 1px 8px rgb(18 22 30 / 0.05);
   }
 
   .bar {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     justify-content: space-between;
     gap: 1rem;
-    height: 68px;
+    height: 72px;
   }
 
   .brand {
@@ -126,32 +127,54 @@ const isActive = (href: string) =>
     color: var(--ink-2);
   }
 
-  .site-nav ul {
+  /* nav links run the full height of the bar; the active marker is a
+     navy bar sitting flush on the header's bottom edge */
+  .site-nav,
+  .site-nav ul,
+  .site-nav li {
     display: flex;
-    align-items: center;
-    gap: 0.25rem;
+    align-items: stretch;
+  }
+
+  .site-nav ul {
+    gap: clamp(0.25rem, 1.5vw, 1rem);
   }
 
   .site-nav a {
+    position: relative;
     display: inline-flex;
     align-items: center;
-    padding: 0.5rem 0.85rem;
-    min-height: 44px;
-    border-radius: 999px;
-    font-size: 0.92rem;
+    padding: 0 0.35rem;
+    font-size: 0.94rem;
     font-weight: 500;
     color: var(--ink-2);
-    transition: color 0.15s ease, background-color 0.15s ease;
+    transition: color 0.15s ease;
+  }
+
+  .site-nav a::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: -1px; /* covers the header hairline */
+    height: 3px;
+    background: var(--accent);
+    opacity: 0;
+    transform: scaleX(0.4);
+    transition: opacity 0.18s ease, transform 0.18s ease;
   }
 
   .site-nav a:hover {
     color: var(--ink);
-    background: var(--surface-2);
   }
 
   .site-nav a[aria-current="page"] {
     color: var(--accent-strong);
-    background: var(--accent-tint);
+    font-weight: 650;
+  }
+
+  .site-nav a[aria-current="page"]::after {
+    opacity: 1;
+    transform: scaleX(1);
   }
 
   .nav-toggle {
@@ -160,6 +183,7 @@ const isActive = (href: string) =>
     justify-content: center;
     width: 44px;
     height: 44px;
+    align-self: center;
     border-radius: var(--radius-sm);
     color: var(--ink);
   }
@@ -188,11 +212,12 @@ const isActive = (href: string) =>
     .site-nav {
       display: none;
       position: absolute;
-      top: 68px;
+      top: 72px;
       left: 0;
       right: 0;
-      background: var(--bg);
+      background: var(--surface);
       border-bottom: 1px solid var(--line);
+      box-shadow: 0 12px 24px rgb(18 22 30 / 0.08);
       padding: 0.5rem var(--pad) 1rem;
     }
 
@@ -204,13 +229,23 @@ const isActive = (href: string) =>
       flex-direction: column;
       align-items: stretch;
       gap: 0.15rem;
+      width: 100%;
     }
 
     .site-nav a {
       width: 100%;
       padding: 0.7rem 0.85rem;
-      border-radius: var(--radius-sm);
+      border-left: 3px solid transparent;
       font-size: 1rem;
+    }
+
+    .site-nav a::after {
+      display: none;
+    }
+
+    .site-nav a[aria-current="page"] {
+      border-left-color: var(--accent);
+      background: var(--accent-tint);
     }
   }
 </style>

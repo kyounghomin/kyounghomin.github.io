@@ -16,6 +16,11 @@ const ProfessorBio = professor ? (await render(professor)).Content : null;
 // Only sections that actually have members are rendered.
 const sections = [
   { role: "phd", title: "Ph.D. Students", label: "Ph.D. Student" },
+  {
+    role: "msphd",
+    title: "Integrated M.S.–Ph.D. Students",
+    label: "M.S.–Ph.D. Student",
+  },
   { role: "ms", title: "M.S. Students", label: "M.S. Student" },
   {
     role: "undergrad",
@@ -51,16 +56,10 @@ const alumni = byRole("alumni");
             />
             <div class="prof-body">
               <h3>{professor.data.name}</h3>
-              <p class="prof-role">Professor · Director of EIC Lab</p>
+              <p class="prof-role">Professor</p>
               <div class="prof-bio">
                 <ProfessorBio />
               </div>
-              {professor.data.interests && (
-                <p class="prof-interests">
-                  <strong>Research interests:</strong>{" "}
-                  {professor.data.interests}
-                </p>
-              )}
               {professor.data.email && (
                 <a class="chip" href={`mailto:${professor.data.email}`}>
                   {professor.data.email}
@@ -85,9 +84,11 @@ const alumni = byRole("alumni");
               <MemberCard
                 name={member.data.name}
                 position={section.label}
+                track={member.data.track}
                 image={member.data.image}
                 interests={member.data.interests}
                 currentResearch={member.data.currentResearch}
+                publications={member.data.publications}
                 email={member.data.email}
                 links={member.data.links}
               />
@@ -206,17 +207,6 @@ const alumni = byRole("alumni");
 
   .prof-bio :global(p + p) {
     margin-top: 0.6rem;
-  }
-
-  .prof-interests {
-    margin-top: 0.9rem;
-    font-size: 0.9rem;
-    color: var(--ink-2);
-  }
-
-  .prof-interests strong {
-    color: var(--ink);
-    font-weight: 600;
   }
 
   .prof-body .chip {

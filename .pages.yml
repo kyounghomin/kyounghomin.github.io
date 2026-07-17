@@ -13,6 +13,13 @@ media:
     extensions: [jpg, jpeg, png, webp, avif, svg]
     categories: [image]
     rename: safe
+  - name: news_images
+    label: News images
+    input: public/images/news
+    output: /images/news
+    extensions: [jpg, jpeg, png, webp, avif, svg]
+    categories: [image]
+    rename: safe
 
 components:
   profile_links:
@@ -89,6 +96,25 @@ content:
         options:
           minlength: 20
           maxlength: 400
+      - name: images
+        label: News images
+        type: image
+        description: Optional images shown as a slideshow in the news pop-up.
+        options:
+          media: news_images
+          multiple:
+            max: 10
+          unique: true
+          categories: [image]
+          rename: safe
+      - name: body
+        label: Full story
+        type: rich-text
+        description: Optional article text shown in the news pop-up.
+        options:
+          format: markdown
+          media: news_images
+          rename: safe
 
   - name: gallery
     label: Photo gallery
@@ -113,14 +139,30 @@ content:
         options:
           maxlength: 120
       - name: image
-        label: Image
+        label: Main image
         type: image
         required: true
-        description: Use a landscape 4:3 image for the cleanest gallery crop.
+        description: Cover photo shown in the gallery grid. Use a landscape 4:3 image for the cleanest crop.
         options:
           media: gallery_images
           categories: [image]
           rename: safe
+      - name: images
+        label: More photos (uploads)
+        type: image
+        description: Additional photos for this event, stored in the repo. Shown in the pop-up viewer.
+        options:
+          media: gallery_images
+          multiple:
+            max: 20
+          unique: true
+          categories: [image]
+          rename: safe
+      - name: imageLinks
+        label: More photos (external links)
+        type: string
+        list: true
+        description: "Paste full image URLs (https://...) hosted elsewhere — saves repo storage. Shown in the pop-up viewer."
       - name: category
         label: Category
         type: select
@@ -178,12 +220,20 @@ content:
               label: Professor
             - name: phd
               label: Ph.D. student
+            - name: msphd
+              label: Integrated M.S.–Ph.D. student
             - name: ms
               label: M.S. student
             - name: undergrad
               label: Undergraduate researcher
             - name: alumni
               label: Alumni
+      - name: track
+        label: Program / track
+        type: string
+        description: "Optional note shown after the position, e.g. SSIT."
+        options:
+          maxlength: 40
       - name: image
         label: Portrait
         type: image
@@ -208,6 +258,11 @@ content:
         label: Email
         type: string
         description: Optional public university email address.
+      - name: publications
+        label: Publications
+        type: string
+        list: true
+        description: "One entry per line, e.g. Title — Venue, Year. Shown in the member pop-up."
       - name: links
         component: profile_links
       - name: formerPosition

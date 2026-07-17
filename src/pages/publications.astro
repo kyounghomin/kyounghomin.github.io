@@ -6,20 +6,28 @@ import PageHeader from "../components/PageHeader.astro";
 
 const pubs = await getCollection("publications");
 
-const years = [...new Set(pubs.map((p) => p.data.year))].sort((a, b) => b - a);
+/* preprints are pending publication — they live in a dedicated section on
+   top of the page instead of inside the year groups */
+const preprints = pubs
+  .filter((p) => p.data.preprint)
+  .sort((a, b) => b.data.year - a.data.year || a.data.order - b.data.order);
+
+const published = pubs.filter((p) => !p.data.preprint);
+
+const years = [...new Set(published.map((p) => p.data.year))].sort(
+  (a, b) => b - a
+);
 
 // ponytail: type derived from venue text; add a schema field if it ever guesses wrong
 const typeOf = (pub: CollectionEntry<"publications">) =>
-  pub.data.preprint
-    ? "Preprint"
-    : /journal|transactions|magazine/i.test(pub.data.venue)
-      ? "Journal"
-      : "Conference";
+  /journal|transactions|magazine/i.test(pub.data.venue)
+    ? "Journal"
+    : "Conference";
 
-const sections = ["Conference", "Journal", "Preprint"];
+const sections = ["Conference", "Journal"];
 
 const groupsFor = (year: number) => {
-  const inYear = pubs.filter((p) => p.data.year === year);
+  const inYear = published.filter((p) => p.data.year === year);
   return sections
     .map((label) => ({
       label,
@@ -42,6 +50,46 @@ const linkLabels: Record<string, string> = {
   <PageHeader kicker="Publications" title="Publications" />
 
   <div class="container section">
+    {
+      preprints.length > 0 && (
+        <section class="year-group" aria-labelledby="preprints">
+          <h2 id="preprints" class="year mono">
+            Preprints
+          </h2>
+          <div class="year-body">
+            <ul class="pub-list">
+              {preprints.map((pub) => (
+                <li class="pub">
+                  <p class="ref">
+                    <span class="authors">{pub.data.authors}.</span>{" "}
+                    <span class="title">“{pub.data.title}.”</span>{" "}
+                    <span class="venue">
+                      {pub.data.venue}, {pub.data.year}.
+                    </span>
+                    {pub.data.venueShort && (
+                      <span class="venue-tag mono arxiv">
+                        {pub.data.venueShort}
+                      </span>
+                    )}
+                  </p>
+                  {Object.values(pub.data.links).some(Boolean) && (
+                    <div class="pub-links">
+                      {Object.entries(pub.data.links)
+                        .filter(([, href]) => href)
+                        .map(([key, href]) => (
+                          <a class="chip" href={href}>
+                            {linkLabels[key] ?? key}
+                          </a>
+                        ))}
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )
+    }
     {
       years.map((year) => (
         <section class="year-group" aria-labelledby={`year-${year}`}>

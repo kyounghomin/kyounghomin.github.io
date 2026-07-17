@@ -26,14 +26,21 @@ GitHub Pages deployment workflow.
 
 ### News — `src/content/news/`
 
-Shown on the home page (5 most recent).
+The four most recent items are shown on the home page. The full news page opens
+each item in a pop-up; optional images appear there as a swipeable slideshow.
 
 ```yaml
 ---
 title: "Paper accepted to ICCAD 2026"
 date: 2026-07-02
 description: "One or two sentences shown under the title."
+images:                         # optional; up to 10 images
+  - "/images/news/iccad-team.webp"
+  - "/images/news/iccad-talk.webp"
 ---
+
+Optional full story written in Markdown. If omitted, the pop-up uses the
+description above.
 ```
 
 ### Members — `src/content/members/`
@@ -109,7 +116,11 @@ order: 1
 
 ## Images
 
-Static images live in `public/images/` (`members/`, `gallery/`). Current images are generated SVG placeholders — replace them with real photos (any format) and update the `image:` paths. Member photos display square (1:1); gallery photos display 4:3.
+Static images live in `public/images/` (`members/`, `gallery/`, and `news/`).
+Current member and gallery images are generated SVG placeholders — replace them
+with real photos and update the matching paths. Member photos display square
+(1:1), gallery photos display 4:3, and news slideshow images preserve their full
+frame inside a 4:3 viewing area.
 
 ## Design
 

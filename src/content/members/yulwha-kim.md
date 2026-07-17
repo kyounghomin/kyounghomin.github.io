@@ -4,6 +4,11 @@ role: professor
 image: "/images/members/yulwha-kim.svg"
 interests: "Efficient deep learning, hardware–software co-design, intelligent computing systems"
 email: "yulwha.kim@skku.edu"
+links:
+  scholar: "#"
+  orcid: "#"
+  dblp: "#"
+  cv: "#"
 order: 1
 ---
 

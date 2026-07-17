@@ -60,11 +60,26 @@ const alumni = byRole("alumni");
               <div class="prof-bio">
                 <ProfessorBio />
               </div>
-              {professor.data.email && (
-                <a class="chip" href={`mailto:${professor.data.email}`}>
-                  {professor.data.email}
-                </a>
-              )}
+              <div class="prof-links">
+                {professor.data.email && (
+                  <a class="chip" href={`mailto:${professor.data.email}`}>
+                    {professor.data.email}
+                  </a>
+                )}
+                {[
+                  ["Google Scholar", professor.data.links.scholar],
+                  ["ORCID", professor.data.links.orcid],
+                  ["DBLP", professor.data.links.dblp],
+                  ["CV", professor.data.links.cv],
+                  ["Website", professor.data.links.website],
+                ]
+                  .filter(([, href]) => href)
+                  .map(([label, href]) => (
+                    <a class="chip" href={href}>
+                      {label}
+                    </a>
+                  ))}
+              </div>
             </div>
           </article>
         </section>
@@ -135,6 +150,14 @@ const alumni = byRole("alumni");
         </section>
       )
     }
+
+    <!-- quiet recruiting note — deliberately not a banner -->
+    <p class="recruiting">
+      We are recruiting M.S. and Ph.D. students interested in efficient
+      computing. Reach out at
+      <a href="mailto:eiclab@skku.edu">eiclab@skku.edu</a> with your CV and
+      transcript.
+    </p>
   </div>
 </Base>
 
@@ -209,8 +232,11 @@ const alumni = byRole("alumni");
     margin-top: 0.6rem;
   }
 
-  .prof-body .chip {
-    margin-top: 1rem;
+  .prof-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.1rem;
   }
 
   /* ---- student grid ---- */
@@ -258,6 +284,26 @@ const alumni = byRole("alumni");
   .alumni-current .arrow {
     color: var(--accent);
     flex: none;
+  }
+
+  .recruiting {
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.95rem;
+    color: var(--ink-2);
+    max-width: 62ch;
+  }
+
+  .recruiting a {
+    color: var(--accent);
+    font-weight: 550;
+  }
+
+  .recruiting a:hover {
+    color: var(--accent-strong);
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   /* ---- responsive ---- */

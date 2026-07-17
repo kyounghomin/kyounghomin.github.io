@@ -37,6 +37,9 @@ const members = defineCollection({
         about: z.string().optional(),
         website: z.string().optional(),
         scholar: z.string().optional(),
+        orcid: z.string().optional(),
+        dblp: z.string().optional(),
+        cv: z.string().optional(),
       })
       .default({}),
     /** alumni only */

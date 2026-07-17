@@ -38,6 +38,18 @@ components:
         label: Google Scholar
         type: string
         description: Full Google Scholar profile URL.
+      - name: orcid
+        label: ORCID
+        type: string
+        description: Full https://orcid.org/ URL.
+      - name: dblp
+        label: DBLP
+        type: string
+        description: Full DBLP profile URL.
+      - name: cv
+        label: CV
+        type: string
+        description: URL or site path to a CV (PDF).
   publication_links:
     type: object
     label: Publication links

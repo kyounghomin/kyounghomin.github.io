@@ -57,7 +57,7 @@ const fmtDay = (date: Date) =>
             </h2>
             <div class="entries">
               {postsIn(year).map(({ item, Content, hasBody }) => (
-                <article class="entry">
+                <article class="entry" id={`post-${item.id}`}>
                   <time
                     class="entry-date mono"
                     datetime={item.data.date.toISOString().slice(0, 10)}

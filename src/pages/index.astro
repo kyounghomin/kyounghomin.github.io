@@ -10,6 +10,10 @@ const news = (await getCollection("news"))
 const featured = (await getCollection("gallery", ({ data }) => data.featured))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
+const recentPubs = (await getCollection("publications"))
+  .sort((a, b) => b.data.year - a.data.year || a.data.order - b.data.order)
+  .slice(0, 3);
+
 const fmt = (date: Date) =>
   date.toLocaleDateString("en-US", {
     month: "short",
@@ -71,6 +75,31 @@ const slides = featured.map((item) => ({
         <Carousel slides={slides} label="Featured photos from the gallery" />
       </div>
     </div>
+
+    <section class="recent-pubs" aria-labelledby="pubs-heading">
+      <div class="col-head">
+        <h2 id="pubs-heading">Recent Publications</h2>
+        <a class="head-link" href="/publications/">All publications →</a>
+      </div>
+      <ul class="home-pub-list">
+        {
+          recentPubs.map((pub) => (
+            <li class="home-pub">
+              <p>
+                <span class="pub-authors">{pub.data.authors}.</span>{" "}
+                <span class="pub-title">“{pub.data.title}.”</span>{" "}
+                <span class="pub-venue">
+                  {pub.data.venue}, {pub.data.year}.
+                </span>
+                {pub.data.venueShort && (
+                  <span class="pub-tag mono">{pub.data.venueShort}</span>
+                )}
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
   </section>
 </Base>
 
@@ -136,7 +165,7 @@ const slides = featured.map((item) => ({
     margin-bottom: 1rem;
   }
 
-  #news-heading {
+  .col-head h2 {
     font-size: clamp(1.35rem, 2.4vw, 1.65rem);
     font-weight: 660;
     line-height: 1.2;
@@ -182,6 +211,56 @@ const slides = featured.map((item) => ({
     margin-top: 0.3rem;
     font-size: 0.9rem;
     color: var(--ink-2);
+  }
+
+  /* ---- recent publications ---- */
+  .recent-pubs {
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+    padding-top: clamp(1.5rem, 3vw, 2rem);
+    border-top: 1px solid var(--line);
+  }
+
+  .home-pub-list {
+    display: grid;
+  }
+
+  .home-pub {
+    padding-block: 0.95rem;
+  }
+
+  .home-pub + .home-pub {
+    border-top: 1px solid var(--line);
+  }
+
+  .home-pub p {
+    font-size: 0.93rem;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+
+  .pub-title {
+    font-weight: 620;
+    color: var(--ink);
+  }
+
+  .pub-venue {
+    font-style: italic;
+  }
+
+  .pub-tag {
+    display: inline-block;
+    margin-left: 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    font-style: normal;
+    color: var(--accent-strong);
+    background: var(--accent-tint);
+    border: 1px solid var(--accent-line);
+    border-radius: 4px;
+    padding: 0.06rem 0.4rem;
+    white-space: nowrap;
+    vertical-align: 0.08em;
   }
 
   @media (max-width: 860px) {

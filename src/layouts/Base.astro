@@ -18,6 +18,12 @@ const {
 
 const pageTitle = title ? `${title} · EIC Lab` : "EIC Lab · Sungkyunkwan University";
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site) : undefined;
+const ogImage = Astro.site ? new URL("/og.png", Astro.site) : undefined;
+
+/* TEMP: keep the whole site out of search engines while news, publications,
+   and gallery still hold fictional placeholder content. Flip to false once
+   the real content is in. */
+const placeholderNoindex = true;
 ---
 
 <!doctype html>
@@ -27,12 +33,23 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site) : undefin
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
-    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    {(noindex || placeholderNoindex) && (
+      <meta name="robots" content="noindex, nofollow" />
+    )}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     {canonical && <link rel="canonical" href={canonical} />}
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="EIC Lab — News"
+      href="/rss.xml"
+    />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="generator" content={Astro.generator} />
   </head>
   <body>

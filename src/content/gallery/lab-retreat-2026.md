@@ -1,7 +1,7 @@
 ---
-title: "Lab Retreat in Gangwon"
-image: "/images/gallery/lab-retreat-2026.svg"
-category: "Lab Life"
+title: ICML Poster, Seoul
+image: /images/gallery/icml-2026-qtale-poster.jpg
+category: Conference
 date: 2026-05-16
 featured: true
 ---

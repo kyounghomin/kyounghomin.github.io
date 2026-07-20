@@ -1,14 +1,15 @@
 ---
-# EXAMPLE POST — demonstrates the blog layout (cover image, inline images,
-# rich text). Replace with a real write-up or delete.
 title: "Paper Study Notes: A Week of KV-Cache Compression Papers"
 date: 2026-06-02
-summary: "Our reading group spent a week on KV-cache compression — here's what we took away, including where we still disagree."
+summary: Our reading group spent a week on KV-cache compression — here's what we
+  took away, including where we still disagree.
 category: Paper Study
-# authors: list the real participants here, one name per line, in order —
-# verified the byline/pop-up linking works correctly (temporary test, reverted).
+authors:
+  - Kyoungho Min
+  - Seongjun Park
+  - Jinheon Choi
+  - Yuna Lee
 ---
-
 This week's reading group covered three recent KV-cache compression papers back to back. Summary below, plus the parts we're still arguing about.
 
 ## What they agree on

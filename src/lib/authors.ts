@@ -1,10 +1,20 @@
 import type { CollectionEntry } from "astro:content";
-import { slugify } from "./slug";
 
 export interface MatchedMember {
-  slug: string;
+  id: string;
+  name: string;
   image?: string;
   role: string;
+}
+
+export interface ResolvedAuthor {
+  name: string;
+  member?: MatchedMember;
+}
+
+export interface MemberDisambiguation {
+  /** Added only when equal names also share a role. */
+  sameRoleOrdinal?: number;
 }
 
 export const normalizeAuthorName = (name: string) =>
@@ -21,19 +31,77 @@ export const isAuthorSeparator = (part: string) =>
 export const splitAuthors = (authors: string) =>
   authors.split(/(,\s*and\s+|,\s*|\s+and\s+)/);
 
-/** turn an ordered name list into the same name/separator shape splitAuthors
-    produces ("A", " and ", "B" / "A", ", ", "B", ", and ", "C"), so the same
-    matched-vs-plain rendering logic works for both */
-export const formatNameList = (names: string[]): string[] => {
-  if (names.length <= 1) return [...names];
-  if (names.length === 2) return [names[0], " and ", names[1]];
-  const parts: string[] = [];
-  names.slice(0, -1).forEach((name, i) => {
-    parts.push(name);
-    parts.push(i === names.length - 2 ? ", and " : ", ");
+/** Pages CMS stores Note authors by stable member entry ID (the Markdown
+    filename without its extension). Accept full paths too, so manual
+    references remain easy to recover. */
+export const normalizeMemberReference = (reference: string) =>
+  reference.trim().split("/").at(-1)?.replace(/\.md$/i, "") ?? reference;
+
+const toMatchedMember = (
+  member: CollectionEntry<"members">
+): MatchedMember => ({
+  id: member.id,
+  name: member.data.name,
+  image: member.data.image,
+  role: member.data.role,
+});
+
+/** Resolve a stable member ID first, then fall back to a unique display name
+    for Notes created before ID-backed references were introduced. */
+export const resolveMemberReference = (
+  reference: string,
+  membersByName: Map<string, MatchedMember>,
+  membersById: Map<string, CollectionEntry<"members">>
+) => {
+  const byId = membersById.get(normalizeMemberReference(reference));
+  return byId
+    ? toMatchedMember(byId)
+    : membersByName.get(normalizeAuthorName(reference));
+};
+
+export const resolveAuthorReferences = (
+  references: string[],
+  membersByName: Map<string, MatchedMember>,
+  membersById: Map<string, CollectionEntry<"members">>
+): ResolvedAuthor[] =>
+  references.map((reference) => {
+    const member = resolveMemberReference(reference, membersByName, membersById);
+    return {
+      name: member?.name ?? reference,
+      member,
+    };
   });
-  parts.push(names[names.length - 1]);
-  return parts;
+
+/** Build stable, display-only qualifiers for duplicate member names. A role
+    distinguishes most duplicates; equal names in the same role also get an
+    ordinal derived from their stable file IDs. */
+export const buildMemberDisambiguation = (
+  allMembers: CollectionEntry<"members">[]
+) => {
+  const nameCounts = new Map<string, number>();
+  const roleGroups = new Map<string, CollectionEntry<"members">[]>();
+
+  for (const member of allMembers) {
+    const nameKey = normalizeAuthorName(member.data.name);
+    const roleKey = `${nameKey}:${member.data.role}`;
+    nameCounts.set(nameKey, (nameCounts.get(nameKey) ?? 0) + 1);
+    roleGroups.set(roleKey, [...(roleGroups.get(roleKey) ?? []), member]);
+  }
+
+  const byMemberId = new Map<string, MemberDisambiguation>();
+  for (const group of roleGroups.values()) {
+    const nameKey = normalizeAuthorName(group[0].data.name);
+    if ((nameCounts.get(nameKey) ?? 0) < 2) continue;
+
+    const sorted = [...group].sort((a, b) => a.id.localeCompare(b.id));
+    sorted.forEach((member, index) => {
+      byMemberId.set(member.id, {
+        sameRoleOrdinal: sorted.length > 1 ? index + 1 : undefined,
+      });
+    });
+  }
+
+  return byMemberId;
 };
 
 /** looked up by normalized name — lets pages tell lab members apart from
@@ -41,21 +109,16 @@ export const formatNameList = (names: string[]): string[] => {
     exact same name, there's no way to tell from plain text which one is
     meant, so both are left out — safer unlinked than confidently wrong. */
 export const buildMemberMaps = (allMembers: CollectionEntry<"members">[]) => {
-  const nameCounts = new Map<string, number>();
-  for (const m of allMembers) {
-    const key = normalizeAuthorName(m.data.name);
-    nameCounts.set(key, (nameCounts.get(key) ?? 0) + 1);
-  }
+  const memberDisambiguation = buildMemberDisambiguation(allMembers);
 
   const membersByName = new Map<string, MatchedMember>();
-  const membersBySlug = new Map<string, CollectionEntry<"members">>();
+  const membersById = new Map<string, CollectionEntry<"members">>();
   for (const m of allMembers) {
     const key = normalizeAuthorName(m.data.name);
-    const slug = slugify(m.data.name);
-    membersBySlug.set(slug, m);
-    if ((nameCounts.get(key) ?? 0) > 1) continue;
-    membersByName.set(key, { slug, image: m.data.image, role: m.data.role });
+    membersById.set(m.id, m);
+    if (memberDisambiguation.has(m.id)) continue;
+    membersByName.set(key, toMatchedMember(m));
   }
 
-  return { membersByName, membersBySlug };
+  return { membersByName, membersById, memberDisambiguation };
 };

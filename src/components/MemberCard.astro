@@ -1,8 +1,8 @@
 ---
-import { slugify } from "../lib/slug";
 import MemberDialog from "./MemberDialog.astro";
 
 interface Props {
+  memberId: string;
   name: string;
   position: string;
   track?: string;
@@ -21,6 +21,7 @@ interface Props {
 }
 
 const {
+  memberId,
   name,
   position,
   track,
@@ -35,9 +36,8 @@ const {
 } = Astro.props;
 
 const photo = image ?? "/images/members/placeholder.svg";
-const slug = slugify(name);
-const dialogId = `member-dialog-${slug}`;
-const anchorId = `member-${slug}`;
+const dialogId = `member-dialog-${memberId}`;
+const anchorId = `member-${memberId}`;
 
 const externalLinks = [
   { label: "Website", href: links.website },

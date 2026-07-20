@@ -2,11 +2,25 @@
 import { getCollection } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import PageHeader from "../../components/PageHeader.astro";
-import { formatNameList } from "../../lib/authors";
+import { ROLE_LABELS } from "../../lib/roles";
+import {
+  buildMemberMaps,
+  resolveAuthorReferences,
+} from "../../lib/authors";
 
 const posts = (await getCollection("notes")).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
+const allMembers = await getCollection("members");
+const { membersByName, membersById, memberDisambiguation } = buildMemberMaps(allMembers);
+const postsWithAuthors = posts.map((post) => ({
+  post,
+  authors: resolveAuthorReferences(
+    post.data.authors,
+    membersByName,
+    membersById
+  ),
+}));
 
 const categories = [
   ...new Set(posts.map((p) => p.data.category).filter(Boolean)),
@@ -48,7 +62,7 @@ const fmt = (date: Date) =>
           )}
 
           <ul class="post-list" data-notes>
-            {posts.map((post) => (
+            {postsWithAuthors.map(({ post, authors }) => (
               <li class="post card" data-category={post.data.category ?? ""}>
                 <a class="post-link" href={`/notes/${post.id}/`}>
                   <img
@@ -71,10 +85,31 @@ const fmt = (date: Date) =>
                     </div>
                     <h2>{post.data.title}</h2>
                     <p class="summary">{post.data.summary}</p>
-                    {post.data.authors.length > 0 && (
-                      <p class="authors">
-                        {formatNameList(post.data.authors).join("")}
-                      </p>
+                    {authors.length > 0 && (
+                      <div class="authors" aria-label={`By ${authors.map((author) => author.name).join(", ")}`}>
+                        {authors.map((author) => (
+                          <span class="author">
+                            <img
+                              src={author.member?.image ?? "/images/members/placeholder.svg"}
+                              alt=""
+                              width="24"
+                              height="24"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                            <span>
+                              {author.name}
+                              {author.member && memberDisambiguation.has(author.member.id) && (
+                                <small>
+                                  {" · "}{ROLE_LABELS[author.member.role] ?? author.member.role}
+                                  {memberDisambiguation.get(author.member.id)?.sameRoleOrdinal &&
+                                    ` #${memberDisambiguation.get(author.member.id)?.sameRoleOrdinal}`}
+                                </small>
+                              )}
+                            </span>
+                          </span>
+                        ))}
+                      </div>
                     )}
                   </div>
                 </a>
@@ -190,11 +225,37 @@ const fmt = (date: Date) =>
   }
 
   .authors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.65rem;
     margin-top: auto;
     padding-top: 0.8rem;
     font-size: 0.8rem;
     font-weight: 550;
     color: var(--ink-3);
+  }
+
+  .author {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  .author img {
+    width: 24px;
+    height: 24px;
+    flex: none;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--surface-2);
+  }
+
+  .author small {
+    color: var(--ink-3);
+    font-size: 0.7rem;
+    font-weight: 500;
   }
 
   @media (max-width: 1000px) {

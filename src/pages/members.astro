@@ -3,7 +3,6 @@ import { getCollection, render } from "astro:content";
 import Base from "../layouts/Base.astro";
 import PageHeader from "../components/PageHeader.astro";
 import MemberCard from "../components/MemberCard.astro";
-import { slugify } from "../lib/slug";
 import { ROLE_LABELS } from "../lib/roles";
 
 const members = await getCollection("members");
@@ -38,7 +37,7 @@ const alumni = byRole("alumni");
             Professor
           </h2>
 
-          <article class="prof card" id={`member-${slugify(professor.data.name)}`}>
+          <article class="prof card" id={`member-${professor.id}`}>
             <img
               class="prof-photo"
               src={professor.data.image}
@@ -91,6 +90,7 @@ const alumni = byRole("alumni");
           <div class="member-grid">
             {byRole(section.role).map((member) => (
               <MemberCard
+                memberId={member.id}
                 name={member.data.name}
                 position={ROLE_LABELS[section.role] ?? section.role}
                 track={member.data.track}

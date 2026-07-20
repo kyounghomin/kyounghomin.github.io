@@ -48,7 +48,8 @@ description above.
 ```yaml
 ---
 name: "Minjun Park"
-role: phd            # professor | phd | ms | undergrad | alumni
+role: phd            # professor | phd | msphd | ms | undergrad | alumni
+gameEligible: true   # show this active member on the private /game page
 image: "/images/members/minjun-park.svg"
 interests: "LLM quantization, efficient inference systems"
 links:               # shown on hover (desktop) / as buttons (mobile)
@@ -101,22 +102,27 @@ featured: true            # featured photos appear in the home page carousel
 ---
 ```
 
-### Research teams — `src/content/research/`
+### Research areas — `src/content/research/`
 
 The Markdown body is the team description (currently Lorem Ipsum placeholder).
 
 ```yaml
 ---
-title: "Large Language Models"
-icon: llm            # llm | vision | eda | arch
+title: "Efficient AI"
+icon: llm            # llm | eda | arch
 tagline: "One-line summary shown on cards."
 order: 1
 ---
 ```
 
+Funded projects are managed in `src/content/projects/`. Longer event recaps,
+paper studies, group studies, and resources are managed in
+`src/content/notes/`. Both collections are available in Pages CMS.
+
 ## Images
 
-Static images live in `public/images/` (`members/`, `gallery/`, and `news/`).
+Static images live in `public/images/` (`members/`, `gallery/`, `news/`,
+`publications/`, and `notes/`).
 Current member and gallery images are generated SVG placeholders — replace them
 with real photos and update the matching paths. Member photos display square
 (1:1), gallery photos display 4:3, and news slideshow images preserve their full
@@ -124,7 +130,7 @@ frame inside a 4:3 viewing area.
 
 ## Design
 
-Colors, fonts, spacing, and shared styles are defined as CSS custom properties in [`src/styles/global.css`](src/styles/global.css). The palette derives from the lab logo (`public/logo.svg`): navy `#00265F` + charcoal `#303438`. Typography: Newsreader (headings) + Inter (body), self-hosted via Fontsource.
+Colors, fonts, spacing, and shared styles are defined as CSS custom properties in [`src/styles/global.css`](src/styles/global.css). The palette derives from the lab logo: navy `#00265F` + charcoal `#303438`. Typography uses Inter, self-hosted via Fontsource.
 
 Placeholder details to update when known: footer/contact email, phone, and room number.
 

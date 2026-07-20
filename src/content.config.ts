@@ -23,6 +23,8 @@ const members = defineCollection({
   schema: z.object({
     name: z.string(),
     role: z.enum(["professor", "phd", "msphd", "ms", "undergrad", "alumni"]),
+    /** controls whether this active member appears in the private roulette */
+    gameEligible: z.boolean().default(true),
     /** program/track note shown after the position, e.g. "SSIT" */
     track: z.string().optional(),
     /** current lab lead — shown with a badge on their member card */
@@ -63,7 +65,7 @@ const publications = defineCollection({
     /** groups the entry under Conference/Journal/Workshop; falls back to a
         guess from the venue text when unset */
     venueType: z.enum(["conference", "journal", "workshop"]).optional(),
-    year: z.number(),
+    year: z.coerce.number(),
     /** true = shown in the Pre-Print section above the year groups */
     preprint: z.boolean().default(false),
     /** research area id (research collection filename) — links the paper

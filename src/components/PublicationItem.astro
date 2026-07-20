@@ -53,7 +53,7 @@ const linkLabels: Record<string, string> = {
           // inline there already), so her name still links to the page;
           // everyone else opens their existing member pop-up right here
           return m.role === "professor" ? (
-            <a class="member-name" href={`/members/#member-${m.slug}`}>
+            <a class="member-name" href={`/members/#member-${m.id}`}>
               {part}
             </a>
           ) : (
@@ -62,7 +62,7 @@ const linkLabels: Record<string, string> = {
               type="button"
               data-open
               aria-haspopup="dialog"
-              aria-controls={`member-dialog-${m.slug}`}
+              aria-controls={`member-dialog-${m.id}`}
             >
               {part}
             </button>
@@ -136,7 +136,7 @@ const linkLabels: Record<string, string> = {
                 const m = matchMember(part);
                 if (!m) return part;
                 return m.role === "professor" ? (
-                  <a class="member-name" href={`/members/#member-${m.slug}`}>
+                  <a class="member-name" href={`/members/#member-${m.id}`}>
                     {part}
                   </a>
                 ) : (
@@ -145,7 +145,7 @@ const linkLabels: Record<string, string> = {
                     type="button"
                     data-open
                     aria-haspopup="dialog"
-                    aria-controls={`member-dialog-${m.slug}`}
+                    aria-controls={`member-dialog-${m.id}`}
                   >
                     {part}
                   </button>
@@ -159,7 +159,7 @@ const linkLabels: Record<string, string> = {
                   match.role === "professor" ? (
                     <a
                       class="author-avatar"
-                      href={`/members/#member-${match.slug}`}
+                      href={`/members/#member-${match.id}`}
                     >
                       <img
                         src={match.image ?? "/images/members/placeholder.svg"}
@@ -177,7 +177,7 @@ const linkLabels: Record<string, string> = {
                       type="button"
                       data-open
                       aria-haspopup="dialog"
-                      aria-controls={`member-dialog-${match.slug}`}
+                      aria-controls={`member-dialog-${match.id}`}
                     >
                       <img
                         src={match.image ?? "/images/members/placeholder.svg"}

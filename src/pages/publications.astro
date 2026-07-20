@@ -5,7 +5,6 @@ import Base from "../layouts/Base.astro";
 import PageHeader from "../components/PageHeader.astro";
 import PublicationItem from "../components/PublicationItem.astro";
 import MemberDialog from "../components/MemberDialog.astro";
-import { slugify } from "../lib/slug";
 import { ROLE_LABELS } from "../lib/roles";
 import {
   buildMemberMaps,
@@ -17,7 +16,7 @@ import {
 
 const pubs = await getCollection("publications");
 const allMembers = await getCollection("members");
-const { membersByName, membersBySlug } = buildMemberMaps(allMembers);
+const { membersByName, membersById } = buildMemberMaps(allMembers);
 
 /* preprints are pending publication — they live in a dedicated section on
    top of the page instead of inside the year groups */
@@ -82,7 +81,7 @@ const groupsFor = (years: number[]) => {
 /* every non-professor member referenced as an author anywhere on this page
    gets exactly one pop-up rendered (deduplicated), which the citation
    links/buttons in PublicationItem open in place — no page navigation */
-const matchedSlugs = new Set(
+const matchedMemberIds = new Set(
   pubs
     .flatMap((p) => splitAuthors(p.data.authors))
     .filter((part) => !isAuthorSeparator(part))
@@ -90,10 +89,10 @@ const matchedSlugs = new Set(
     .filter(
       (m): m is MatchedMember => m !== undefined && m.role !== "professor"
     )
-    .map((m) => m.slug)
+    .map((m) => m.id)
 );
-const popupMembers = [...matchedSlugs]
-  .map((slug) => membersBySlug.get(slug))
+const popupMembers = [...matchedMemberIds]
+  .map((id) => membersById.get(id))
   .filter((m): m is CollectionEntry<"members"> => m !== undefined);
 
 const hasMarkers = pubs.some((p) => /[*⁺]/.test(p.data.authors));
@@ -152,7 +151,7 @@ const hasMarkers = pubs.some((p) => /[*⁺]/.test(p.data.authors));
   {
     popupMembers.map((m) => (
       <MemberDialog
-        dialogId={`member-dialog-${slugify(m.data.name)}`}
+        dialogId={`member-dialog-${m.id}`}
         name={m.data.name}
         position={ROLE_LABELS[m.data.role] ?? m.data.role}
         track={m.data.track}

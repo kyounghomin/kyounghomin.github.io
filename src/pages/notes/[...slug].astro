@@ -5,9 +5,7 @@ import MemberDialog from "../../components/MemberDialog.astro";
 import { ROLE_LABELS } from "../../lib/roles";
 import {
   buildMemberMaps,
-  formatNameList,
-  isAuthorSeparator,
-  normalizeAuthorName,
+  resolveAuthorReferences,
 } from "../../lib/authors";
 
 export async function getStaticPaths() {
@@ -22,15 +20,20 @@ const { post } = Astro.props;
 const { Content } = await render(post);
 
 const allMembers = await getCollection("members");
-const { membersByName, membersBySlug } = buildMemberMaps(allMembers);
+const { membersByName, membersById, memberDisambiguation } = buildMemberMaps(allMembers);
+const authors = resolveAuthorReferences(
+  post.data.authors,
+  membersByName,
+  membersById
+);
 
-const bylineParts = formatNameList(post.data.authors);
-
-const popupMembers = bylineParts
-  .filter((part) => !isAuthorSeparator(part))
-  .map((name) => membersByName.get(normalizeAuthorName(name)))
-  .filter((m): m is NonNullable<typeof m> => m !== undefined && m.role !== "professor")
-  .map((m) => membersBySlug.get(m.slug))
+const popupMembers = [...new Set(
+  authors
+    .map((author) => author.member)
+    .filter((member) => member && member.role !== "professor")
+    .map((member) => member!.id)
+)]
+  .map((id) => membersById.get(id))
   .filter((m): m is NonNullable<typeof m> => m !== undefined);
 
 const fmt = (date: Date) =>
@@ -54,32 +57,58 @@ const fmt = (date: Date) =>
         <time datetime={post.data.date.toISOString().slice(0, 10)}>
           {fmt(post.data.date)}
         </time>
-        {bylineParts.length > 0 && (
-          <span class="byline">
-            {" "}
-            · By{" "}
-            {bylineParts.map((part) => {
-              const m = membersByName.get(normalizeAuthorName(part));
-              if (!m) return part;
-              return m.role === "professor" ? (
-                <a class="author-name" href={`/members/#member-${m.slug}`}>
-                  {part}
-                </a>
-              ) : (
+      </p>
+      {authors.length > 0 && (
+        <div class="byline" aria-label={`Authors: ${authors.map((author) => author.name).join(", ")}`}>
+          <span class="by-label">By</span>
+          <div class="by-authors">
+            {authors.map((author) => {
+              const member = author.member;
+              const contents = (
+                <>
+                  <img
+                    src={member?.image ?? "/images/members/placeholder.svg"}
+                    alt=""
+                    width="28"
+                    height="28"
+                    loading="eager"
+                    decoding="async"
+                  />
+                  <span>
+                    {author.name}
+                    {member && memberDisambiguation.has(member.id) && (
+                      <small>
+                        {" · "}{ROLE_LABELS[member.role] ?? member.role}
+                        {memberDisambiguation.get(member.id)?.sameRoleOrdinal &&
+                          ` #${memberDisambiguation.get(member.id)?.sameRoleOrdinal}`}
+                      </small>
+                    )}
+                  </span>
+                </>
+              );
+              if (!member) return <span class="author-person">{contents}</span>;
+              if (member.role === "professor") {
+                return (
+                  <a class="author-person" href={`/members/#member-${member.id}`}>
+                    {contents}
+                  </a>
+                );
+              }
+              return (
                 <button
-                  class="author-name author-name-btn"
+                  class="author-person"
                   type="button"
                   data-open
                   aria-haspopup="dialog"
-                  aria-controls={`member-dialog-${m.slug}`}
+                  aria-controls={`member-dialog-${member.id}`}
                 >
-                  {part}
+                  {contents}
                 </button>
               );
             })}
-          </span>
-        )}
-      </p>
+          </div>
+        </div>
+      )}
     </header>
 
     {post.data.coverImage && (
@@ -102,7 +131,7 @@ const fmt = (date: Date) =>
   {
     popupMembers.map((m) => (
       <MemberDialog
-        dialogId={`member-dialog-${membersByName.get(normalizeAuthorName(m.data.name))?.slug}`}
+        dialogId={`member-dialog-${m.id}`}
         name={m.data.name}
         position={ROLE_LABELS[m.data.role] ?? m.data.role}
         track={m.data.track}
@@ -153,28 +182,61 @@ const fmt = (date: Date) =>
   }
 
   .byline {
-    font-family: var(--sans);
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-top: 0.9rem;
+    color: var(--ink-3);
+    font-size: 0.82rem;
   }
 
-  .author-name {
-    font-weight: 640;
+  .by-label {
+    flex: none;
+    font-family: var(--mono);
+  }
+
+  .by-authors {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .author-person {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 34px;
+    padding: 0.18rem 0.55rem 0.18rem 0.2rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
     color: var(--ink-2);
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1;
   }
 
-  .author-name-btn {
-    font: inherit;
-    letter-spacing: inherit;
-    border: none;
-    background: none;
-    padding: 0;
-    cursor: pointer;
-    font-weight: 640;
-  }
-
-  .author-name:hover {
+  button.author-person:hover,
+  a.author-person:hover {
+    border-color: var(--accent-line);
+    background: var(--accent-tint);
     color: var(--accent-strong);
-    text-decoration: underline;
-    text-underline-offset: 3px;
+  }
+
+  .author-person img {
+    width: 28px;
+    height: 28px;
+    flex: none;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--surface-2);
+  }
+
+  .author-person small {
+    color: var(--ink-3);
+    font-size: 0.68rem;
+    font-weight: 500;
   }
 
   .cover {
@@ -245,6 +307,14 @@ const fmt = (date: Date) =>
     padding-left: 1.4rem;
   }
 
+  .prose :global(ul) {
+    list-style: disc;
+  }
+
+  .prose :global(ol) {
+    list-style: decimal;
+  }
+
   .prose :global(li + li) {
     margin-top: 0.4rem;
   }
@@ -255,5 +325,20 @@ const fmt = (date: Date) =>
     background: var(--surface-2);
     border-radius: 4px;
     padding: 0.1em 0.35em;
+  }
+
+  .prose :global(pre) {
+    max-width: 100%;
+    overflow-x: auto;
+    margin-block: 1.5rem;
+    padding: 1rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+  }
+
+  .prose :global(pre code) {
+    padding: 0;
+    background: transparent;
   }
 </style>

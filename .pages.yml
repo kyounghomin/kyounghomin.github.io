@@ -219,8 +219,12 @@ content:
     type: collection
     path: src/content/members
     format: yaml-frontmatter
-    filename: "{name}.md"
+    filename:
+      template: "{name}.md"
+      field: create
     subfolders: false
+    operations:
+      rename: false
     view:
       fields: [image, name, role, order]
       primary: name
@@ -234,6 +238,7 @@ content:
         label: Full name
         type: string
         required: true
+        description: Display names may repeat. If they do, give the filename a short unique suffix when creating the member.
         options:
           maxlength: 100
       - name: role
@@ -254,6 +259,11 @@ content:
               label: Undergraduate researcher
             - name: alumni
               label: Alumni
+      - name: gameEligible
+        label: Include in member roulette
+        type: boolean
+        default: true
+        description: Controls whether this person appears on the private /game page. Alumni are always excluded.
       - name: track
         label: Program / track
         type: string
@@ -274,7 +284,7 @@ content:
       - name: image
         label: Portrait
         type: image
-        description: Use a square portrait. Alumni may leave this empty.
+        description: Square portrait used on the Members page and Note author bylines. Alumni may leave this empty.
         options:
           media: member_images
           categories: [image]
@@ -335,9 +345,9 @@ content:
     filename: "{year}-{venueShort}-{title}.md"
     subfolders: false
     view:
-      fields: [title, venueShort, year, order]
+      fields: [year, order, title]
       primary: title
-      sort: [year, venueShort, order, title]
+      sort: [year, order]
       search: [title, authors, venue, venueShort]
       default:
         sort: year
@@ -349,6 +359,22 @@ content:
         required: true
         options:
           maxlength: 300
+      - name: year
+        label: Year
+        type: select
+        required: true
+        options:
+          placeholder: Select a year
+          values: [2030, 2029, 2028, 2027, 2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010]
+      - name: order
+        label: Order within year
+        type: number
+        required: true
+        default: 99
+        description: Lower numbers appear first within the selected year.
+        options:
+          min: 1
+          max: 999
       - name: authors
         label: Authors
         type: text
@@ -382,13 +408,6 @@ content:
               label: Journal
             - name: workshop
               label: Workshop
-      - name: year
-        label: Year
-        type: number
-        required: true
-        options:
-          min: 1900
-          max: 2100
       - name: preprint
         label: Pre-print
         type: boolean
@@ -422,16 +441,6 @@ content:
               label: Computer architecture
       - name: links
         component: publication_links
-      - name: order
-        label: Display order
-        type: number
-        required: true
-        default: 99
-        description: Lower numbers appear first within the same year.
-        options:
-          min: 1
-          max: 999
-
   - name: research
     label: Research areas
     type: collection
@@ -544,7 +553,7 @@ content:
     filename: "{date}-{title}.md"
     subfolders: false
     view:
-      fields: [coverImage, title, category, date]
+      fields: [title, date, authors]
       primary: title
       sort: [date, title]
       search: [title, summary, authors]
@@ -572,6 +581,26 @@ content:
         options:
           minlength: 20
           maxlength: 300
+      - name: body
+        label: Post body
+        type: rich-text
+        required: true
+        description: Write visually in Editor mode, or switch to Source for Markdown. Use the image button to place photos between paragraphs.
+        options:
+          format: markdown
+          media: notes_images
+          rename: safe
+          switcher: true
+      - name: authors
+        label: Authors
+        type: reference
+        description: Select members in display order. Names may repeat; the role and unique member ID identify the right person.
+        options:
+          collection: members
+          multiple: true
+          search: "name,email,role,track"
+          value: "{name}"
+          label: "{primary} · {fields.role} · ID: {name}"
       - name: category
         label: Category
         type: select
@@ -591,20 +620,6 @@ content:
         options:
           media: notes_images
           categories: [image]
-          rename: safe
-      - name: authors
-        label: Authors
-        type: string
-        list: true
-        description: "One name per line, exactly as it appears in Members, in display order (first listed = first author). Drag to reorder. Required for Paper Study / Group Study posts — matched names get a linked byline + pop-up."
-      - name: body
-        label: Post body
-        type: rich-text
-        required: true
-        description: Write the post here. Use the image button to insert photos between paragraphs.
-        options:
-          format: markdown
-          media: notes_images
           rename: safe
 
 settings:

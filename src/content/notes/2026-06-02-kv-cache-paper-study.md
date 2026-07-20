@@ -5,10 +5,10 @@ summary: Our reading group spent a week on KV-cache compression — here's what 
   took away, including where we still disagree.
 category: Paper Study
 authors:
-  - Kyoungho Min
-  - Seongjun Park
-  - Jinheon Choi
-  - Yuna Lee
+  - kyoungho-min
+  - seongjun-park
+  - jinheon-choi
+  - yuna-lee
 ---
 This week's reading group covered three recent KV-cache compression papers back to back. Summary below, plus the parts we're still arguing about.
 

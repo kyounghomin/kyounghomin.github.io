@@ -5,9 +5,6 @@ summary: Not quite news, more than a gallery caption — some photos and honest
   impressions from presenting at ICML this year.
 category: Event
 coverImage: /images/gallery/icml-2026-group.jpg
-authors:
-  - Kyoungho Min
-  - Seongjun Park
 ---
 Getting the whole lab to Seoul for ICML week was chaotic in the best way — badge printers jamming, someone's poster tube going missing at baggage claim, and a group chat that would not stop buzzing. Worth every bit of it.
 

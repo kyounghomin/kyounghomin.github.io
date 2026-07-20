@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
-  <rect width="800" height="600" fill="#e6e4da"/>
-  <circle cx="400" cy="-60" r="220" fill="#5d5942" opacity="0.06"/>
-     <circle cx="60" cy="300" r="120" fill="#5d5942" opacity="0.07"/>
-     <circle cx="740" cy="340" r="140" fill="#5d5942" opacity="0.07"/>
-  <rect x="16" y="16" width="768" height="568" fill="none" stroke="#5d5942" stroke-opacity="0.18"/>
-  <text x="400" y="272" text-anchor="middle" font-family="Inter, 'Helvetica Neue', Arial, sans-serif" font-size="13" font-weight="600" letter-spacing="5" fill="#5d5942" opacity="0.6">EIC LAB</text>
-  <text x="400" y="318" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="34" letter-spacing="6" fill="#5d5942">AI WORKSHOP</text>
-</svg>

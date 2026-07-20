@@ -25,6 +25,10 @@ const members = defineCollection({
     role: z.enum(["professor", "phd", "msphd", "ms", "undergrad", "alumni"]),
     /** program/track note shown after the position, e.g. "SSIT" */
     track: z.string().optional(),
+    /** current lab lead — shown with a badge on their member card */
+    labLead: z.boolean().default(false),
+    /** major/department, shown in the About pop-up, e.g. "Computer Science" */
+    major: z.string().optional(),
     image: z.string().optional(),
     interests: z.string().optional(),
     /** rough description of what they're working on right now */
@@ -56,9 +60,20 @@ const publications = defineCollection({
     authors: z.string(),
     venue: z.string(),
     venueShort: z.string().optional(),
+    /** groups the entry under Conference/Journal/Workshop; falls back to a
+        guess from the venue text when unset */
+    venueType: z.enum(["conference", "journal", "workshop"]).optional(),
     year: z.number(),
     /** true = shown in the Pre-Print section above the year groups */
     preprint: z.boolean().default(false),
+    /** research area id (research collection filename) — links the paper
+        to its card on the research page */
+    area: z.string().optional(),
+    /** shown in the publications page pop-up. papers without an abstract
+        stay plain text (not clickable) — only "selected" ones get the pop-up */
+    abstract: z.string().optional(),
+    /** representative figure shown in the pop-up */
+    image: z.string().optional(),
     links: z
       .object({
         paper: z.string().optional(),
@@ -97,4 +112,46 @@ const research = defineCollection({
   }),
 });
 
-export const collections = { news, members, publications, gallery, research };
+/** ongoing funded research projects (과제) shown on the research page */
+const projects = defineCollection({
+  loader: glob({ pattern: "**/[^_]*.md", base: "./src/content/projects" }),
+  schema: z.object({
+    title: z.string(),
+    /** funding agency or company, e.g. IITP, NRF, 삼성전자 */
+    funder: z.string(),
+    /** project period, e.g. "2024.04 – 2027.12" */
+    period: z.string(),
+    order: z.number().default(99),
+  }),
+});
+
+/** notes: longer-form writeups that don't fit News (too informal/personal) or
+    Gallery (more than just photos) — event recaps, paper/group-study notes,
+    presentation/template archives (자료실), etc. Body supports images
+    inserted between paragraphs via normal markdown. */
+const notes = defineCollection({
+  loader: glob({ pattern: "**/[^_]*.md", base: "./src/content/notes" }),
+  schema: z.object({
+    title: z.string(),
+    date: z.coerce.date(),
+    /** short teaser shown on the notes list page */
+    summary: z.string(),
+    category: z.string().optional(),
+    /** shown on the list page and at the top of the post */
+    coverImage: z.string().optional(),
+    /** authors of this post, in display order — matched against the members
+        collection to show a linked, ordered byline + avatar pop-ups.
+        Paper/group-study posts should always list their participants here. */
+    authors: z.array(z.string()).default([]),
+  }),
+});
+
+export const collections = {
+  news,
+  members,
+  publications,
+  gallery,
+  research,
+  projects,
+  notes,
+};

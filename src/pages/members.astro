@@ -3,6 +3,8 @@ import { getCollection, render } from "astro:content";
 import Base from "../layouts/Base.astro";
 import PageHeader from "../components/PageHeader.astro";
 import MemberCard from "../components/MemberCard.astro";
+import { slugify } from "../lib/slug";
+import { ROLE_LABELS } from "../lib/roles";
 
 const members = await getCollection("members");
 const byRole = (role: string) =>
@@ -15,18 +17,10 @@ const ProfessorBio = professor ? (await render(professor)).Content : null;
 
 // Only sections that actually have members are rendered.
 const sections = [
-  { role: "phd", title: "Ph.D. Students", label: "Ph.D. Student" },
-  {
-    role: "msphd",
-    title: "Integrated M.S.–Ph.D. Students",
-    label: "M.S.–Ph.D. Student",
-  },
-  { role: "ms", title: "M.S. Students", label: "M.S. Student" },
-  {
-    role: "undergrad",
-    title: "Undergraduate Researchers",
-    label: "Undergraduate",
-  },
+  { role: "phd", title: "Ph.D. Students" },
+  { role: "msphd", title: "Integrated M.S.–Ph.D. Students" },
+  { role: "ms", title: "M.S. Students" },
+  { role: "undergrad", title: "Undergraduate Researchers" },
 ].filter((section) => byRole(section.role).length > 0);
 
 const alumni = byRole("alumni");
@@ -44,7 +38,7 @@ const alumni = byRole("alumni");
             Professor
           </h2>
 
-          <article class="prof card">
+          <article class="prof card" id={`member-${slugify(professor.data.name)}`}>
             <img
               class="prof-photo"
               src={professor.data.image}
@@ -57,6 +51,9 @@ const alumni = byRole("alumni");
             <div class="prof-body">
               <h3>{professor.data.name}</h3>
               <p class="prof-role">Professor</p>
+              {professor.data.major && (
+                <p class="prof-major">{professor.data.major}</p>
+              )}
               <div class="prof-bio">
                 <ProfessorBio />
               </div>
@@ -68,9 +65,6 @@ const alumni = byRole("alumni");
                 )}
                 {[
                   ["Google Scholar", professor.data.links.scholar],
-                  ["ORCID", professor.data.links.orcid],
-                  ["DBLP", professor.data.links.dblp],
-                  ["CV", professor.data.links.cv],
                   ["Website", professor.data.links.website],
                 ]
                   .filter(([, href]) => href)
@@ -98,8 +92,10 @@ const alumni = byRole("alumni");
             {byRole(section.role).map((member) => (
               <MemberCard
                 name={member.data.name}
-                position={section.label}
+                position={ROLE_LABELS[section.role] ?? section.role}
                 track={member.data.track}
+                major={member.data.major}
+                labLead={member.data.labLead}
                 image={member.data.image}
                 interests={member.data.interests}
                 currentResearch={member.data.currentResearch}
@@ -151,13 +147,6 @@ const alumni = byRole("alumni");
       )
     }
 
-    <!-- quiet recruiting note — deliberately not a banner -->
-    <p class="recruiting">
-      We are recruiting M.S. and Ph.D. students interested in efficient
-      computing. Reach out at
-      <a href="mailto:eiclab@skku.edu">eiclab@skku.edu</a> with your CV and
-      transcript.
-    </p>
   </div>
 </Base>
 
@@ -190,8 +179,9 @@ const alumni = byRole("alumni");
   /* ---- professor ---- */
   .prof {
     display: grid;
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: minmax(260px, 26%) 1fr;
     overflow: hidden;
+    scroll-margin-top: 90px; /* clears the sticky site header when linked to */
   }
 
   /* photo fills its column edge-to-edge; the card's radius rounds the
@@ -219,6 +209,12 @@ const alumni = byRole("alumni");
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--accent);
+  }
+
+  .prof-major {
+    margin-top: 0.25rem;
+    font-size: 0.85rem;
+    color: var(--ink-2);
   }
 
   .prof-bio {
@@ -284,26 +280,6 @@ const alumni = byRole("alumni");
   .alumni-current .arrow {
     color: var(--accent);
     flex: none;
-  }
-
-  .recruiting {
-    margin-top: clamp(2.5rem, 5vw, 3.5rem);
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--line);
-    font-size: 0.95rem;
-    color: var(--ink-2);
-    max-width: 62ch;
-  }
-
-  .recruiting a {
-    color: var(--accent);
-    font-weight: 550;
-  }
-
-  .recruiting a:hover {
-    color: var(--accent-strong);
-    text-decoration: underline;
-    text-underline-offset: 3px;
   }
 
   /* ---- responsive ---- */

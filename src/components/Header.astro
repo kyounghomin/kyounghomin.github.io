@@ -5,6 +5,7 @@ const nav = [
   { href: "/research/", label: "Research" },
   { href: "/news/", label: "News" },
   { href: "/gallery/", label: "Gallery" },
+  { href: "/notes/", label: "Notes" },
   { href: "/publications/", label: "Publications" },
 ];
 
@@ -16,9 +17,11 @@ const isActive = (href: string) =>
 <header class="site-header" data-header>
   <div class="container bar">
     <a class="brand" href="/">
-      <!-- EIC monogram from public/logo.svg -->
+      <!-- EIC monogram from design-system/eic-lab/logo.svg; explicit width so
+           mobile browsers that don't derive it from the viewBox don't collapse it -->
       <svg
         class="brand-mark"
+        width="49"
         height="26"
         viewBox="150 110 900 480"
         aria-hidden="true"
@@ -36,9 +39,19 @@ const isActive = (href: string) =>
           <rect x="720" y="490" width="330" height="100"></rect>
         </g>
       </svg>
-      <span class="brand-name"
-        >EIC Lab<span class="brand-lab">&nbsp;@ SKKU</span></span
-      >
+      <span class="brand-name">EIC Lab</span>
+      <span class="brand-divider" aria-hidden="true"></span>
+      <img
+        class="skku-mark"
+        src="/skku_logo_transparent.png"
+        alt=""
+        width="285"
+        height="285"
+      />
+      <span class="brand-uni">
+        <span class="uni-full">SKKU</span>
+        <span class="uni-short">SKKU</span>
+      </span>
     </a>
 
     <nav class="site-nav" id="site-nav" aria-label="Main">
@@ -105,8 +118,9 @@ const isActive = (href: string) =>
   .brand {
     display: inline-flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: 0.55rem;
     min-height: 44px;
+    white-space: nowrap;
   }
 
   .brand-mark {
@@ -122,9 +136,31 @@ const isActive = (href: string) =>
     color: var(--ink);
   }
 
-  .brand-lab {
-    font-weight: 450;
+  .brand-divider {
+    flex: none;
+    width: 1px;
+    height: 22px;
+    background: var(--line);
+    margin-inline: 0.35rem;
+  }
+
+  .skku-mark {
+    width: 38px;
+    height: 38px;
+    flex: none;
+    object-fit: contain;
+  }
+
+  .brand-uni {
+    font-family: var(--sans);
+    font-size: 1.02rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
     color: var(--ink-2);
+  }
+
+  .uni-short {
+    display: none;
   }
 
   /* nav links run the full height of the bar; the active marker is a
@@ -246,6 +282,22 @@ const isActive = (href: string) =>
     .site-nav a[aria-current="page"] {
       border-left-color: var(--accent);
       background: var(--accent-tint);
+    }
+  }
+
+  /* long university name doesn't fit next to the menu button on phones */
+  @media (max-width: 600px) {
+    .uni-full {
+      display: none;
+    }
+
+    .uni-short {
+      display: inline;
+    }
+
+    .skku-mark {
+      width: 39px;
+      height: 39px;
     }
   }
 </style>

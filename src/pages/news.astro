@@ -139,16 +139,15 @@ const fmtDay = (date: Date) =>
     margin-inline: auto;
   }
 
-  .year-group {
-    /* anchor lands below the sticky header + year bar */
-    scroll-margin-top: 135px;
-  }
-
   .year-group + .year-group {
     margin-top: clamp(2.5rem, 5vw, 3.5rem);
   }
 
+  /* anchor lands below the sticky header + year bar; scroll-margin has to
+     sit on the element the #hash actually targets (the heading / entry),
+     not their parent, or the browser scrolls it flush under the sticky bars */
   .year {
+    scroll-margin-top: 135px;
     font-size: 1.2rem;
     font-weight: 650;
     letter-spacing: 0.04em;
@@ -162,6 +161,7 @@ const fmtDay = (date: Date) =>
     grid-template-columns: 84px 1fr;
     gap: 1.25rem;
     padding-block: clamp(1.4rem, 3vw, 1.9rem);
+    scroll-margin-top: 135px;
   }
 
   .entry + .entry {

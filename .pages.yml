@@ -20,6 +20,20 @@ media:
     extensions: [jpg, jpeg, png, webp, avif, svg]
     categories: [image]
     rename: safe
+  - name: publication_images
+    label: Publication figures
+    input: public/images/publications
+    output: /images/publications
+    extensions: [jpg, jpeg, png, webp, avif, svg]
+    categories: [image]
+    rename: safe
+  - name: notes_images
+    label: Notes images
+    input: public/images/notes
+    output: /images/notes
+    extensions: [jpg, jpeg, png, webp, avif, svg]
+    categories: [image]
+    rename: safe
 
 components:
   profile_links:
@@ -246,6 +260,17 @@ content:
         description: "Optional note shown after the position, e.g. SSIT."
         options:
           maxlength: 40
+      - name: labLead
+        label: Current lab lead
+        type: boolean
+        default: false
+        description: Shows a lab lead badge on this person's member card. Should be true for exactly one person at a time.
+      - name: major
+        label: Major / department
+        type: string
+        description: "Shown in the About pop-up, e.g. Computer Science, Semiconductor Systems Engineering."
+        options:
+          maxlength: 100
       - name: image
         label: Portrait
         type: image
@@ -345,6 +370,18 @@ content:
         description: Short label such as DAC, NeurIPS, or TCAD.
         options:
           maxlength: 30
+      - name: venueType
+        label: Venue type
+        type: select
+        description: Groups the entry under Conference/Journal/Workshop on the publications page.
+        options:
+          values:
+            - name: conference
+              label: Conference
+            - name: journal
+              label: Journal
+            - name: workshop
+              label: Workshop
       - name: year
         label: Year
         type: number
@@ -357,6 +394,32 @@ content:
         type: boolean
         default: false
         description: Pre-prints are listed in their own section above the year groups.
+      - name: abstract
+        label: Abstract
+        type: text
+        description: Optional. Papers with an abstract get a clickable pop-up (title, authors, figure, abstract); papers without one stay plain text.
+        options:
+          maxlength: 1200
+      - name: image
+        label: Figure
+        type: image
+        description: Optional representative figure shown at the top of the pop-up.
+        options:
+          media: publication_images
+          categories: [image]
+          rename: safe
+      - name: area
+        label: Research area
+        type: select
+        description: Links the paper to its card on the research page.
+        options:
+          values:
+            - name: efficient-ai
+              label: Efficient AI
+            - name: eda
+              label: Electronic design automation
+            - name: arch
+              label: Computer architecture
       - name: links
         component: publication_links
       - name: order
@@ -427,6 +490,122 @@ content:
         options:
           format: markdown
           media: false
+
+  - name: projects
+    label: Funded projects
+    type: collection
+    path: src/content/projects
+    format: yaml-frontmatter
+    filename: "{title}.md"
+    subfolders: false
+    view:
+      fields: [title, funder, period, order]
+      primary: title
+      sort: [order, title]
+      search: [title, funder]
+      default:
+        sort: order
+        order: asc
+    fields:
+      - name: title
+        label: Project title (과제명)
+        type: string
+        required: true
+        options:
+          maxlength: 200
+      - name: funder
+        label: Funding agency (지원기관)
+        type: string
+        required: true
+        description: "e.g. IITP (정보통신기획평가원), 한국연구재단 (NRF), 삼성전자"
+        options:
+          maxlength: 100
+      - name: period
+        label: Project period
+        type: string
+        required: true
+        description: "e.g. 2024.04 – 2027.12, or 2024.04 – Present"
+        options:
+          maxlength: 40
+      - name: order
+        label: Display order
+        type: number
+        required: true
+        default: 99
+        options:
+          min: 1
+          max: 999
+
+  - name: notes
+    label: Notes
+    type: collection
+    path: src/content/notes
+    format: yaml-frontmatter
+    filename: "{date}-{title}.md"
+    subfolders: false
+    view:
+      fields: [coverImage, title, category, date]
+      primary: title
+      sort: [date, title]
+      search: [title, summary, authors]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+        options:
+          maxlength: 150
+      - name: date
+        label: Date
+        type: date
+        required: true
+        options:
+          format: yyyy-MM-dd
+      - name: summary
+        label: Summary
+        type: text
+        required: true
+        description: Short teaser shown on the notes list page.
+        options:
+          minlength: 20
+          maxlength: 300
+      - name: category
+        label: Category
+        type: select
+        description: Loose grouping, shown as a tag on the list page.
+        options:
+          values:
+            - Event
+            - Paper Study
+            - Group Study
+            - Resources
+            - Reflection
+            - Other
+      - name: coverImage
+        label: Cover image
+        type: image
+        description: Shown on the list page and at the top of the post. Optional.
+        options:
+          media: notes_images
+          categories: [image]
+          rename: safe
+      - name: authors
+        label: Authors
+        type: string
+        list: true
+        description: "One name per line, exactly as it appears in Members, in display order (first listed = first author). Drag to reorder. Required for Paper Study / Group Study posts — matched names get a linked byline + pop-up."
+      - name: body
+        label: Post body
+        type: rich-text
+        required: true
+        description: Write the post here. Use the image button to insert photos between paragraphs.
+        options:
+          format: markdown
+          media: notes_images
+          rename: safe
 
 settings:
   hide: true

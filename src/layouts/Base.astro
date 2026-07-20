@@ -16,7 +16,7 @@ const {
   noindex = false,
 } = Astro.props;
 
-const pageTitle = title ? `${title} · EIC Lab` : "EIC Lab · Sungkyunkwan University";
+const pageTitle = title ? `${title} · EIC Lab` : "EIC Lab · SKKU";
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site) : undefined;
 const ogImage = Astro.site ? new URL("/og.png", Astro.site) : undefined;
 
@@ -61,3 +61,28 @@ const placeholderNoindex = true;
     <Footer />
   </body>
 </html>
+
+<script>
+  /* wires up every [data-open]/dialog pair on the page by aria-controls →
+     id, so a trigger and its dialog don't need to share a DOM ancestor —
+     used by member cards, the professor block, and publication pop-ups */
+  document
+    .querySelectorAll<HTMLElement>("[data-open][aria-controls]")
+    .forEach((trigger) => {
+      const dialog = document.getElementById(
+        trigger.getAttribute("aria-controls")!
+      );
+      if (dialog instanceof HTMLDialogElement) {
+        trigger.addEventListener("click", () => dialog.showModal());
+      }
+    });
+
+  document.querySelectorAll<HTMLDialogElement>("dialog").forEach((dialog) => {
+    dialog
+      .querySelector("[data-close]")
+      ?.addEventListener("click", () => dialog.close());
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+  });
+</script>

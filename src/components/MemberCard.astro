@@ -1,8 +1,13 @@
 ---
+import { slugify } from "../lib/slug";
+import MemberDialog from "./MemberDialog.astro";
+
 interface Props {
   name: string;
   position: string;
   track?: string;
+  major?: string;
+  labLead?: boolean;
   image?: string;
   interests?: string;
   currentResearch?: string;
@@ -19,6 +24,8 @@ const {
   name,
   position,
   track,
+  major,
+  labLead = false,
   image,
   interests,
   currentResearch,
@@ -28,10 +35,9 @@ const {
 } = Astro.props;
 
 const photo = image ?? "/images/members/placeholder.svg";
-const dialogId = `member-dialog-${name
-  .toLowerCase()
-  .replace(/[^a-z0-9]+/g, "-")
-  .replace(/^-|-$/g, "")}`;
+const slug = slugify(name);
+const dialogId = `member-dialog-${slug}`;
+const anchorId = `member-${slug}`;
 
 const externalLinks = [
   { label: "Website", href: links.website },
@@ -39,7 +45,7 @@ const externalLinks = [
 ].filter((item) => item.href);
 ---
 
-<article class="member-card card" data-member>
+<article class="member-card card" id={anchorId} data-member>
   <div class="photo">
     <img
       src={photo}
@@ -49,6 +55,23 @@ const externalLinks = [
       loading="lazy"
       decoding="async"
     />
+    {
+      labLead && (
+        <span
+          class="lead-badge"
+          tabindex="0"
+          aria-label={`Lab lead — contact ${name.split(" ")[0]} for more lab info`}
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M3 8l4 3 5-6 5 6 4-3-1.5 10h-15z" />
+          </svg>
+          <span class="lead-tip" aria-hidden="true">
+            <strong>Lab Lead</strong>
+            Contact {name.split(" ")[0]} for more lab info
+          </span>
+        </span>
+      )
+    }
     <div class="photo-links" role="group" aria-label={`Actions for ${name}`}>
       <button
         class="link-pill"
@@ -87,89 +110,19 @@ const externalLinks = [
     {email && <a class="email" href={`mailto:${email}`}>{email}</a>}
   </div>
 
-  <dialog id={dialogId} class="member-dialog" aria-label={`About ${name}`}>
-    <div class="dialog-body">
-      <button class="close" type="button" data-close aria-label="Close">
-        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            d="M6 6l12 12M18 6L6 18"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"></path>
-        </svg>
-      </button>
-
-      <div class="dialog-head">
-        <img
-          class="dialog-photo"
-          src={photo}
-          alt=""
-          width="400"
-          height="400"
-          loading="lazy"
-          decoding="async"
-        />
-        <div class="dialog-title">
-          <h3>{name}</h3>
-          <p class="position">{position}{track && ` · ${track}`}</p>
-        </div>
-      </div>
-
-      <div class="dialog-info">
-
-        {
-          currentResearch && (
-            <>
-              <p class="label">Current research</p>
-              <p class="value">{currentResearch}</p>
-            </>
-          )
-        }
-        {
-          interests && (
-            <>
-              <p class="label">Interests</p>
-              <p class="value">{interests}</p>
-            </>
-          )
-        }
-        {
-          publications.length > 0 && (
-            <>
-              <p class="label">Publications</p>
-              <ul class="pub-list">
-                {publications.map((pub) => (
-                  <li>{pub}</li>
-                ))}
-              </ul>
-            </>
-          )
-        }
-        {
-          email && (
-            <>
-              <p class="label">Email</p>
-              <a class="email-link" href={`mailto:${email}`}>
-                {email}
-              </a>
-            </>
-          )
-        }
-
-        {
-          externalLinks.length > 0 && (
-            <div class="links">
-              {externalLinks.map((item) => (
-                <a class="chip" href={item.href}>
-                  {item.label}
-                </a>
-              ))}
-            </div>
-          )
-        }
-      </div>
-    </div>
-  </dialog>
+  <MemberDialog
+    dialogId={dialogId}
+    name={name}
+    position={position}
+    track={track}
+    major={major}
+    image={photo}
+    interests={interests}
+    currentResearch={currentResearch}
+    publications={publications}
+    email={email}
+    links={links}
+  />
 </article>
 
 <style>
@@ -179,6 +132,7 @@ const externalLinks = [
     flex-direction: column;
     overflow: hidden;
     transition: border-color 0.15s ease;
+    scroll-margin-top: 90px; /* clears the sticky site header when linked to */
   }
 
   .member-card:hover {
@@ -187,6 +141,9 @@ const externalLinks = [
 
   .photo {
     position: relative;
+    /* lets the link pills below react to the card's own width, not the
+       viewport — accurate regardless of how many grid columns are active */
+    container-type: inline-size;
   }
 
   .photo img {
@@ -199,6 +156,68 @@ const externalLinks = [
   .member-card:hover .photo > img,
   .member-card:focus-within .photo > img {
     filter: brightness(0.86);
+  }
+
+  /* crown badge marking the current lab lead, top corner of the photo */
+  .lead-badge {
+    position: absolute;
+    z-index: 2;
+    top: 0.6rem;
+    right: 0.6rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    background: rgba(20, 24, 31, 0.55);
+    color: #f4c542;
+    backdrop-filter: blur(2px);
+    cursor: help;
+  }
+
+  .lead-badge svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* two-line tooltip: bold "Lab Lead" title, name filled in below it —
+     stays correct whenever the lead changes since the name is data-driven */
+  .lead-tip {
+    position: absolute;
+    z-index: 3;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    width: max-content;
+    max-width: 190px;
+    padding: 0.6rem 0.75rem;
+    border-radius: var(--radius-sm);
+    background: var(--ink);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 500;
+    line-height: 1.4;
+    text-align: left;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-4px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+
+  .lead-tip strong {
+    display: block;
+    margin-bottom: 0.2rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #f4c542;
+  }
+
+  .lead-badge:hover .lead-tip,
+  .lead-badge:focus-visible .lead-tip {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   /* keep the pills clickable above the stretched name button */
@@ -231,6 +250,20 @@ const externalLinks = [
     border-color: var(--accent-line);
     background: var(--accent-tint);
     color: var(--accent-strong);
+  }
+
+  /* card too narrow for About + Website + Scholar on one line — shrink
+     instead of letting them wrap to a second row */
+  @container (max-width: 260px) {
+    .photo-links {
+      gap: 0.25rem;
+      padding: 0.55rem 0.6rem;
+    }
+
+    .link-pill {
+      padding: 0.3rem 0.5rem;
+      font-size: 0.68rem;
+    }
   }
 
   /* On hover-capable devices, tuck the links into an overlay that
@@ -317,167 +350,40 @@ const externalLinks = [
     line-height: 1.5;
   }
 
+  /* guaranteed breathing room before the email pill, whichever paragraph
+     ends up right before it (interests, or position when interests is
+     absent) — keeps a minimum gap even when margin-top:auto below has no
+     leftover row space left to push through */
+  .body > p:has(+ .email) {
+    margin-bottom: 1rem;
+  }
+
+  /* pill button, matching the professor's link chips. margin-top:auto pins
+     it to the card's bottom edge, so every card in a grid row lines its
+     email pill up on the same straight line regardless of text length */
   .email {
     position: relative; /* keep clickable above the stretched button */
     z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    align-self: center;
     margin-top: auto;
-    padding-top: 0.8rem;
+    padding: 0.34rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
     font-family: var(--mono);
-    font-size: 0.74rem;
+    font-size: 0.72rem;
+    font-weight: 500;
     color: var(--ink-2);
+    line-height: 1.2;
+    transition: border-color 0.15s ease, color 0.15s ease,
+      background-color 0.15s ease;
   }
 
   .email:hover {
+    border-color: var(--accent-line);
+    background: var(--accent-tint);
     color: var(--accent-strong);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
-  /* ---- dialog ---- */
-  .member-dialog {
-    border: none;
-    padding: 0;
-    border-radius: var(--radius);
-    max-width: min(560px, calc(100vw - 2rem));
-    max-height: calc(100dvh - 2rem);
-    width: 100%;
-    overflow-y: auto;
-    box-shadow: 0 24px 60px rgb(15 20 30 / 0.25);
-  }
-
-  .member-dialog::backdrop {
-    background: rgba(20, 24, 31, 0.55);
-  }
-
-  .dialog-body {
-    position: relative;
-    padding: clamp(1.4rem, 3vw, 1.9rem);
-  }
-
-  /* compact avatar beside the name; content runs full-width below */
-  .dialog-head {
-    display: flex;
-    align-items: center;
-    gap: 1.15rem;
-    padding-bottom: 1.15rem;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .close {
-    position: absolute;
-    top: 0.7rem;
-    right: 0.7rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    border-radius: 999px;
-    color: var(--ink-2);
-    background: var(--surface);
-    cursor: pointer;
-    transition: background-color 0.15s ease, color 0.15s ease;
-  }
-
-  .close:hover {
-    background: var(--surface-2);
-    color: var(--ink);
-  }
-
-  .dialog-photo {
-    width: 108px;
-    aspect-ratio: 1;
-    height: auto;
-    flex: none;
-    object-fit: cover;
-    border-radius: var(--radius-sm);
-  }
-
-  .dialog-title h3 {
-    font-size: 1.4rem;
-    padding-right: 2.25rem;
-  }
-
-  .label {
-    margin-top: 1.05rem;
-    font-family: var(--mono);
-    font-size: 0.66rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--ink-3);
-  }
-
-  .value {
-    margin-top: 0.2rem;
-    font-size: 0.94rem;
-    line-height: 1.55;
-    color: var(--ink);
-  }
-
-  .email-link {
-    display: inline-block;
-    margin-top: 0.2rem;
-    font-family: var(--mono);
-    font-size: 0.82rem;
-    color: var(--accent);
-  }
-
-  .email-link:hover {
-    color: var(--accent-strong);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
-  .pub-list {
-    margin-top: 0.3rem;
-    display: grid;
-    gap: 0.4rem;
-  }
-
-  .pub-list li {
-    position: relative;
-    padding-left: 1em;
-    font-size: 0.88rem;
-    line-height: 1.5;
-    color: var(--ink-2);
-  }
-
-  .pub-list li::before {
-    content: "–";
-    position: absolute;
-    left: 0;
-    color: var(--ink-3);
-  }
-
-  .links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.45rem;
-    margin-top: 1.1rem;
-  }
-
-  @media (max-width: 520px) {
-    .dialog-photo {
-      width: 84px;
-    }
   }
 </style>
-
-<script>
-  document.querySelectorAll<HTMLElement>("[data-member]").forEach((card) => {
-    const dialog = card.querySelector("dialog");
-    if (!dialog) return;
-
-    card.querySelectorAll<HTMLElement>("[data-open]").forEach((trigger) => {
-      trigger.addEventListener("click", () => dialog.showModal());
-    });
-    dialog
-      .querySelector("[data-close]")
-      ?.addEventListener("click", () => dialog.close());
-    // click on the backdrop closes (the padded body swallows inner clicks)
-    dialog.addEventListener("click", (event) => {
-      if (event.target === dialog) dialog.close();
-    });
-  });
-</script>

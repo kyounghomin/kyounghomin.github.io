@@ -30,28 +30,18 @@ const slides = featured.map((item) => ({
 
 <Base>
   <section class="container home">
-    <!-- Quiet one-line identity: lab name left, affiliation right -->
     <header class="identity">
       <h1>Efficient &amp; Intelligent Computing Lab</h1>
-      <p class="affiliation">
-        <img
-          class="skku-mark"
-          src="/skku_logo_transparent.png"
-          alt=""
-          width="285"
-          height="285"
-        />
-        <span class="identity-sub">Sungkyunkwan University</span>
-      </p>
     </header>
 
     <div class="main-grid">
-      <section class="news-col" aria-labelledby="news-heading">
-        <div class="col-head">
-          <h2 id="news-heading">News &amp; Updates</h2>
-          <a class="head-link" href="/news/">All news →</a>
-        </div>
-        <ul class="news-list">
+      <!-- heading sits in its own grid row so the carousel top aligns
+           with the news list, not the heading -->
+      <div class="col-head news-head">
+        <h2 id="news-heading">News &amp; Updates</h2>
+        <a class="head-link" href="/news/">All news →</a>
+      </div>
+      <ul class="news-list" aria-labelledby="news-heading">
           {
             news.map((item) => (
               <li class="news-item">
@@ -68,8 +58,7 @@ const slides = featured.map((item) => ({
               </li>
             ))
           }
-        </ul>
-      </section>
+      </ul>
 
       <div class="carousel-col">
         <Carousel slides={slides} label="Featured photos from the gallery" />
@@ -92,7 +81,11 @@ const slides = featured.map((item) => ({
                   {pub.data.venue}, {pub.data.year}.
                 </span>
                 {pub.data.venueShort && (
-                  <span class="pub-tag mono">{pub.data.venueShort}</span>
+                  <span
+                    class:list={["pub-tag", "mono", { arxiv: pub.data.preprint }]}
+                  >
+                    {pub.data.venueShort}
+                  </span>
                 )}
               </p>
             </li>
@@ -125,36 +118,23 @@ const slides = featured.map((item) => ({
     font-weight: 650;
   }
 
-  /* emblem + university name share one center line */
-  .affiliation {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.65rem;
-    flex: none;
-  }
-
-  .skku-mark {
-    width: clamp(2.1rem, 3.2vw, 2.6rem);
-    aspect-ratio: 1;
-    flex: none;
-    object-fit: contain;
-  }
-
-  .identity-sub {
-    font-family: var(--mono);
-    font-size: 0.78rem;
-    font-weight: 650;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--ink-2);
-  }
-
   /* ---- news + carousel ---- */
   .main-grid {
     display: grid;
     grid-template-columns: 1.05fr 1fr;
-    gap: clamp(2rem, 4vw, 3.5rem);
+    grid-template-rows: auto 1fr;
+    column-gap: clamp(2rem, 4vw, 3.5rem);
     align-items: start;
+  }
+
+  .news-head,
+  .news-list {
+    grid-column: 1;
+  }
+
+  .carousel-col {
+    grid-column: 2;
+    grid-row: 2;
   }
 
   .col-head {
@@ -263,9 +243,23 @@ const slides = featured.map((item) => ({
     vertical-align: 0.08em;
   }
 
+  /* arXiv preprints in red, matching the publications page */
+  .pub-tag.arxiv {
+    color: #9c1c1c;
+    background: #fdf0ef;
+    border-color: #efd0cd;
+  }
+
   @media (max-width: 860px) {
     .main-grid {
       grid-template-columns: 1fr;
+      grid-template-rows: none;
+    }
+
+    .carousel-col {
+      grid-column: 1;
+      grid-row: auto;
+      margin-top: 2rem;
     }
   }
 

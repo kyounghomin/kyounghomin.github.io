@@ -3,40 +3,21 @@ import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import Base from "../layouts/Base.astro";
 import PageHeader from "../components/PageHeader.astro";
+import PublicationItem from "../components/PublicationItem.astro";
+import MemberDialog from "../components/MemberDialog.astro";
+import { slugify } from "../lib/slug";
+import { ROLE_LABELS } from "../lib/roles";
+import {
+  buildMemberMaps,
+  isAuthorSeparator,
+  normalizeAuthorName,
+  splitAuthors,
+  type MatchedMember,
+} from "../lib/authors";
 
 const pubs = await getCollection("publications");
-
-/* lab members' names are bolded in author lists */
-const memberNames = new Set(
-  (await getCollection("members")).map((m) =>
-    m.data.name.replace(/\s*\(Example\)$/, "").toLowerCase()
-  )
-);
-
-/* split an author string into names + separators (", " / " and ") */
-const authorParts = (authors: string) =>
-  authors.split(/(,\s*and\s+|,\s*|\s+and\s+)/);
-
-const isMember = (part: string) => memberNames.has(part.trim().toLowerCase());
-
-/* minimal BibTeX entry from frontmatter, for the copy button */
-const bibtexOf = (pub: CollectionEntry<"publications">) => {
-  const d = pub.data;
-  const lastName =
-    d.authors.split(/,|\s+and\s+/)[0]?.trim().split(/\s+/).pop() ?? "key";
-  const firstWord =
-    d.title.split(/\s+/)[0]?.replace(/[^A-Za-z0-9]/g, "") ?? "";
-  const key = `${lastName}${d.year}${firstWord}`.toLowerCase();
-  const bibAuthors = d.authors
-    .replace(/,\s*and\s+/g, " and ")
-    .replace(/,\s*/g, " and ");
-  const isJournal = /journal|transactions|magazine/i.test(d.venue);
-  const type = d.preprint ? "misc" : isJournal ? "article" : "inproceedings";
-  const venueLine = d.preprint
-    ? `howpublished = {${d.venue}}`
-    : `${isJournal ? "journal" : "booktitle"} = {${d.venue}}`;
-  return `@${type}{${key},\n  title = {${d.title}},\n  author = {${bibAuthors}},\n  ${venueLine},\n  year = {${d.year}}\n}`;
-};
+const allMembers = await getCollection("members");
+const { membersByName, membersBySlug } = buildMemberMaps(allMembers);
 
 /* preprints are pending publication — they live in a dedicated section on
    top of the page instead of inside the year groups */
@@ -46,42 +27,85 @@ const preprints = pubs
 
 const published = pubs.filter((p) => !p.data.preprint);
 
-const years = [...new Set(published.map((p) => p.data.year))].sort(
+const allYears = [...new Set(published.map((p) => p.data.year))].sort(
   (a, b) => b - a
 );
 
-// ponytail: type derived from venue text; add a schema field if it ever guesses wrong
-const typeOf = (pub: CollectionEntry<"publications">) =>
-  /journal|transactions|magazine/i.test(pub.data.venue)
+/* the most recent few years each get their own heading; older work is
+   bundled under one combined heading so the page doesn't turn into dozens
+   of tiny single-entry year sections */
+const RECENT_YEAR_COUNT = 4;
+const recentYears = allYears.slice(0, RECENT_YEAR_COUNT);
+const olderYears = allYears.slice(RECENT_YEAR_COUNT);
+
+const yearGroups = [
+  ...recentYears.map((year) => ({
+    id: String(year),
+    label: String(year),
+    years: [year],
+  })),
+  ...(olderYears.length > 0
+    ? [
+        {
+          id: "earlier",
+          label: `${Math.min(...olderYears)}~${Math.max(...olderYears)}`,
+          years: olderYears,
+        },
+      ]
+    : []),
+];
+
+const typeOf = (pub: CollectionEntry<"publications">) => {
+  if (pub.data.venueType) {
+    return pub.data.venueType[0].toUpperCase() + pub.data.venueType.slice(1);
+  }
+  // ponytail: fallback guess from venue text for entries without venueType
+  return /journal|transactions|magazine/i.test(pub.data.venue)
     ? "Journal"
     : "Conference";
+};
 
-const sections = ["Conference", "Journal"];
+const sections = ["Conference", "Workshop", "Journal"];
 
-const groupsFor = (year: number) => {
-  const inYear = published.filter((p) => p.data.year === year);
+const groupsFor = (years: number[]) => {
+  const inYears = published.filter((p) => years.includes(p.data.year));
   return sections
     .map((label) => ({
       label,
-      items: inYear
+      items: inYears
         .filter((p) => typeOf(p) === label)
         .sort((a, b) => a.data.order - b.data.order),
     }))
     .filter((section) => section.items.length > 0);
 };
 
-const linkLabels: Record<string, string> = {
-  paper: "Paper",
-  code: "Code",
-  project: "Project page",
-  doi: "DOI",
-};
+/* every non-professor member referenced as an author anywhere on this page
+   gets exactly one pop-up rendered (deduplicated), which the citation
+   links/buttons in PublicationItem open in place — no page navigation */
+const matchedSlugs = new Set(
+  pubs
+    .flatMap((p) => splitAuthors(p.data.authors))
+    .filter((part) => !isAuthorSeparator(part))
+    .map((part) => membersByName.get(normalizeAuthorName(part)))
+    .filter(
+      (m): m is MatchedMember => m !== undefined && m.role !== "professor"
+    )
+    .map((m) => m.slug)
+);
+const popupMembers = [...matchedSlugs]
+  .map((slug) => membersBySlug.get(slug))
+  .filter((m): m is CollectionEntry<"members"> => m !== undefined);
+
+const hasMarkers = pubs.some((p) => /[*⁺]/.test(p.data.authors));
 ---
 
 <Base title="Publications">
   <PageHeader kicker="Publications" title="Publications" />
 
   <div class="container section">
+    {hasMarkers && (
+      <p class="legend">* Equal contribution &nbsp; ⁺ Corresponding author</p>
+    )}
     {
       preprints.length > 0 && (
         <section class="year-group" aria-labelledby="preprints">
@@ -91,44 +115,11 @@ const linkLabels: Record<string, string> = {
           <div class="year-body">
             <ul class="pub-list">
               {preprints.map((pub) => (
-                <li class="pub">
-                  <p class="ref">
-                    <span class="authors">
-                      {authorParts(pub.data.authors).map((part) =>
-                        isMember(part) ? (
-                          <strong class="member-name">{part}</strong>
-                        ) : (
-                          part
-                        )
-                      )}.
-                    </span>{" "}
-                    <span class="title">“{pub.data.title}.”</span>{" "}
-                    <span class="venue">
-                      {pub.data.venue}, {pub.data.year}.
-                    </span>
-                    {pub.data.venueShort && (
-                      <span class="venue-tag mono arxiv">
-                        {pub.data.venueShort}
-                      </span>
-                    )}
-                  </p>
-                  <div class="pub-links">
-                    {Object.entries(pub.data.links)
-                      .filter(([, href]) => href)
-                      .map(([key, href]) => (
-                        <a class="chip" href={href}>
-                          {linkLabels[key] ?? key}
-                        </a>
-                      ))}
-                    <button
-                      class="chip bib"
-                      type="button"
-                      data-bibtex={bibtexOf(pub)}
-                    >
-                      BibTeX
-                    </button>
-                  </div>
-                </li>
+                <PublicationItem
+                  pub={pub}
+                  membersByName={membersByName}
+                  isPreprint
+                />
               ))}
             </ul>
           </div>
@@ -136,55 +127,18 @@ const linkLabels: Record<string, string> = {
       )
     }
     {
-      years.map((year) => (
-        <section class="year-group" aria-labelledby={`year-${year}`}>
-          <h2 id={`year-${year}`} class="year mono">
-            {year}
+      yearGroups.map((group) => (
+        <section class="year-group" aria-labelledby={`year-${group.id}`}>
+          <h2 id={`year-${group.id}`} class="year mono">
+            {group.label}
           </h2>
           <div class="year-body">
-            {groupsFor(year).map((section) => (
-              <section class="type-group" aria-label={`${section.label}, ${year}`}>
+            {groupsFor(group.years).map((section) => (
+              <section class="type-group" aria-label={`${section.label}, ${group.label}`}>
                 <h3 class="type-label kicker">{section.label}</h3>
                 <ul class="pub-list">
                   {section.items.map((pub) => (
-                    <li class="pub">
-                      <p class="ref">
-                        <span class="authors">
-                          {authorParts(pub.data.authors).map((part) =>
-                            isMember(part) ? (
-                              <strong class="member-name">{part}</strong>
-                            ) : (
-                              part
-                            )
-                          )}.
-                        </span>{" "}
-                        <span class="title">“{pub.data.title}.”</span>{" "}
-                        <span class="venue">
-                          {pub.data.venue}, {pub.data.year}.
-                        </span>
-                        {pub.data.venueShort && (
-                          <span class="venue-tag mono">
-                            {pub.data.venueShort}
-                          </span>
-                        )}
-                      </p>
-                      <div class="pub-links">
-                        {Object.entries(pub.data.links)
-                          .filter(([, href]) => href)
-                          .map(([key, href]) => (
-                            <a class="chip" href={href}>
-                              {linkLabels[key] ?? key}
-                            </a>
-                          ))}
-                        <button
-                          class="chip bib"
-                          type="button"
-                          data-bibtex={bibtexOf(pub)}
-                        >
-                          BibTeX
-                        </button>
-                      </div>
-                    </li>
+                    <PublicationItem pub={pub} membersByName={membersByName} />
                   ))}
                 </ul>
               </section>
@@ -194,6 +148,24 @@ const linkLabels: Record<string, string> = {
       ))
     }
   </div>
+
+  {
+    popupMembers.map((m) => (
+      <MemberDialog
+        dialogId={`member-dialog-${slugify(m.data.name)}`}
+        name={m.data.name}
+        position={ROLE_LABELS[m.data.role] ?? m.data.role}
+        track={m.data.track}
+        major={m.data.major}
+        image={m.data.image}
+        interests={m.data.interests}
+        currentResearch={m.data.currentResearch}
+        publications={m.data.publications}
+        email={m.data.email}
+        links={m.data.links}
+      />
+    ))
+  }
 </Base>
 
 <style>
@@ -231,68 +203,10 @@ const linkLabels: Record<string, string> = {
     gap: 1.35rem;
   }
 
-  .pub .ref {
-    font-size: 0.95rem;
-    line-height: 1.6;
-    color: var(--ink-2);
-  }
-
-  .authors {
-    color: var(--ink-2);
-  }
-
-  .member-name {
-    font-weight: 640;
-    color: var(--ink);
-  }
-
-  .title {
-    font-weight: 620;
-    color: var(--ink);
-  }
-
-  .venue {
-    font-style: italic;
-  }
-
-  .venue-tag {
-    display: inline-block;
-    margin-left: 0.5rem;
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    font-style: normal;
-    color: var(--accent-strong);
-    background: var(--accent-tint);
-    border: 1px solid var(--accent-line);
-    border-radius: 4px;
-    padding: 0.06rem 0.4rem;
-    white-space: nowrap;
-    vertical-align: 0.08em;
-  }
-
-  /* arXiv preprints stand out from conference tags by color */
-  .venue-tag.arxiv {
-    color: #9c1c1c;
-    background: #fdf0ef;
-    border-color: #efd0cd;
-  }
-
-  .pub-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 0.6rem;
-  }
-
-  .bib {
-    cursor: pointer;
-  }
-
-  .bib:hover {
-    border-color: var(--accent-line);
-    background: var(--accent-tint);
-    color: var(--accent-strong);
+  .legend {
+    margin-bottom: clamp(1.75rem, 3vw, 2.5rem);
+    font-size: 0.82rem;
+    color: var(--ink-3);
   }
 
   @media (max-width: 700px) {
@@ -302,19 +216,3 @@ const linkLabels: Record<string, string> = {
     }
   }
 </style>
-
-<script>
-  document
-    .querySelectorAll<HTMLButtonElement>("[data-bibtex]")
-    .forEach((button) => {
-      button.addEventListener("click", async () => {
-        try {
-          await navigator.clipboard.writeText(button.dataset.bibtex ?? "");
-          button.textContent = "Copied!";
-          setTimeout(() => (button.textContent = "BibTeX"), 1500);
-        } catch {
-          /* clipboard unavailable (http, old browser) — leave the button as is */
-        }
-      });
-    });
-</script>

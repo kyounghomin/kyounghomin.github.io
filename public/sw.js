@@ -1,1 +1,0 @@
-importScripts("/sw.min.js");

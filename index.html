@@ -65,7 +65,7 @@
       </div>
       <div class="nav-links" style="display: flex; align-items: center; gap: 6px 18px; font-size: 14px; letter-spacing: 0.04em; flex-wrap: wrap;">
         <sc-if value="{{ showNews }}" hint-placeholder-val="{{ true }}"><a href="#news" style="color: #555; transition: color .15s;" style-hover="color: #12305f; text-decoration: none;">News</a></sc-if>
-        <a href="#publications" style="color: #555; transition: color .15s;" style-hover="color: #12305f; text-decoration: none;">Publications</a>
+        <sc-if value="{{ showPublications }}" hint-placeholder-val="{{ true }}"><a href="#publications" style="color: #555; transition: color .15s;" style-hover="color: #12305f; text-decoration: none;">Publications</a></sc-if>
         <sc-if value="{{ showEducation }}" hint-placeholder-val="{{ true }}"><a href="#education" style="color: #555; transition: color .15s;" style-hover="color: #12305f; text-decoration: none;">Education</a></sc-if>
         <sc-if value="{{ showExperience }}" hint-placeholder-val="{{ true }}"><a href="#experience" style="color: #555; transition: color .15s;" style-hover="color: #12305f; text-decoration: none;">Experience</a></sc-if>
         <a href="{{ cvHref }}" target="_blank" rel="noopener" style="background: #12305f; color: #ffffff; padding: 6px 16px; border-radius: 8px; font-size: 13.5px; font-weight: 600; transition: background .15s;" style-hover="background: #0a1d3d; color: #ffffff; text-decoration: none;">CV</a>
@@ -135,6 +135,7 @@
     </section>
     </sc-if>
 
+    <sc-if value="{{ showPublications }}" hint-placeholder-val="{{ true }}">
     <section id="publications" class="page-section" style="padding-top: 72px; scroll-margin-top: 64px;">
       <h2 class="section-title" style="font-size: 24px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 20px; padding-bottom: 10px; border-bottom: 2px solid #12305f;">Publications</h2>
       <div style="display: grid; gap: 28px;">
@@ -163,6 +164,7 @@
         </sc-for>
       </div>
     </section>
+    </sc-if>
 
     <sc-if value="{{ showEducation }}" hint-placeholder-val="{{ true }}">
     <section id="education" class="page-section" style="padding-top: 72px; scroll-margin-top: 64px;">
@@ -267,7 +269,7 @@ class Component extends DCLogic {
   renderVals() {
     const p = this.state.p;
     if (!p) return {
-      showNews: false, showEducation: false, showExperience: false,
+      showNews: false, showPublications: false, showEducation: false, showExperience: false,
       links: [], focusTags: [], news: [], pubYears: [], education: [], experience: [],
       name: '', role: '', affiliation: '', tagline: '', emailHref: '', emailText: '', photo: '',
       cvHref: '', focusBlurb: '', lastUpdated: '', scrollPct: 0,
@@ -308,6 +310,7 @@ class Component extends DCLogic {
       scrollPct: this.state.scroll,
       focusBlurb: p.focus.blurb, focusTags: p.focus.tags,
       showNews: (this.props.showNews ?? true) && p.news.length > 0,
+      showPublications: p.publications.length > 0,
       showEducation: p.education.length > 0,
       showExperience: p.experience.length > 0,
       news: p.news, pubYears, education: p.education, experience: p.experience,

@@ -1,5 +1,6 @@
 // ── Personal website content: edit ONLY this file ──────────────────
 // Each field maps to a section on the page. An empty list hides its section.
+// NOTE: currently filled with EXAMPLE data (Gildong Hong) for template review.
 export default {
   // Shared lab identity
   lab: {
@@ -10,54 +11,81 @@ export default {
     logo: 'assets/images/eic-logo.svg',
   },
 
-  name: 'Kyoungho Min',
+  name: 'Gildong Hong',
   role: 'MS–PhD Student @ EIC Lab',
   affiliation: 'Efficient & Intelligent Computing Lab, Sungkyunkwan University',
-  tagline: 'Working on efficient AI for multimodal and generative models.',
-  photo: 'assets/images/profile.jpg',
+  tagline: 'Studying how large models learn, generalize, and fail.',
+  photo: 'assets/images/profile-placeholder.svg',
   // Email is split to keep it out of scraper reach
-  emailUser: 'kyohmin',
+  emailUser: 'gildong.hong',
   emailDomain: 'g.skku.edu',
 
+  // Links get icons automatically by label: GitHub, Scholar, LinkedIn, ORCID, X
   links: [
-    { label: 'GitHub', href: 'https://github.com/kyounghomin' },
-    // More links get icons automatically by label — e.g.:
-    // { label: 'Scholar', href: 'https://scholar.google.com/citations?user=...' },
-    // { label: 'LinkedIn', href: 'https://www.linkedin.com/in/...' },
-    // { label: 'ORCID', href: 'https://orcid.org/...' },
+    { label: 'GitHub', href: 'https://github.com/gildonghong' },
+    { label: 'Scholar', href: 'https://scholar.google.com' },
+    { label: 'LinkedIn', href: 'https://linkedin.com' },
   ],
-  // Points at the exported PDF; cv.html is the editable source it's printed from
   cv: { file: 'cv.pdf' },
 
   focus: {
-    blurb: 'I work on efficient AI for multimodal and generative models. My current research modifies the initial noise of flow-based text-to-image models to enhance image quality.',
-    tags: ['Efficient AI', 'Multimodal Models', 'Image Generation (T2I)', 'Flow Models'],
+    blurb: 'My research focuses on the science of large language models — training dynamics, interpretability, and rigorous evaluation — with the goal of making foundation models more reliable and better understood.',
+    tags: ['LLM Training Dynamics', 'Interpretability', 'Robust Evaluation', 'Foundation Models'],
   },
 
-  // The News section stays hidden while this list is empty. Example:
-  // { date: 'May 2026', text: 'Our paper was accepted to ...' },
-  news: [],
-
-  // The Publications section stays hidden while this list is empty.
-  // badge: short venue tag shown above the title (e.g. 'ICML 2026', 'Preprint'). Example:
-  // {
-  //   year: 2026, badge: 'Preprint',
-  //   title: 'Paper Title',
-  //   authors: 'Kyoungho Min, Co Author',
-  //   venue: 'arXiv preprint arXiv:...',
-  //   paper: 'https://arxiv.org/abs/...', code: 'https://github.com/...',
-  //   bib: '@article{...}',
-  // },
-  publications: [],
-
-  education: [
-    // TODO: add the start year (period: '2025 – Present') and a B.S. entry.
-    { period: '', degree: 'MS–PhD Combined Program', detail: 'Department of Electrical and Computer Engineering, Sungkyunkwan University', extra: 'Advisor: Prof. Yulhwa Kim' },
+  news: [
+    { date: 'Jun 2026', text: 'Our paper on emergent abilities was selected for an oral presentation at ICML 2026.' },
+    { date: 'Mar 2026', text: 'Started a research internship at an industry AI lab.' },
+    { date: 'Sep 2025', text: 'One paper accepted to NeurIPS 2025.' },
   ],
 
-  // TODO: add internships / TA positions here; the section stays hidden while empty.
-  // { org: 'Company', role: 'Research Intern', period: '2026', bullets: ['What you did'] },
-  experience: [],
+  // badge: short venue tag shown above the title (e.g. 'ICML 2026', 'Preprint')
+  publications: [
+    {
+      year: 2026, badge: 'ICML 2026',
+      title: 'Understanding Emergent Abilities Through the Lens of Training Dynamics',
+      authors: 'Gildong Hong*, Cheolsu Kim*, Younghee Lee',
+      note: '*Equal contribution',
+      venue: 'The 43rd International Conference on Machine Learning (ICML 2026) — Oral',
+      paper: 'https://arxiv.org', code: 'https://github.com',
+      bib: '@inproceedings{hong2026emergent,\n  title={Understanding Emergent Abilities Through the Lens of Training Dynamics},\n  author={Hong, Gildong and Kim, Cheolsu and Lee, Younghee},\n  booktitle={ICML},\n  year={2026}\n}',
+    },
+    {
+      year: 2026, badge: 'Preprint',
+      title: 'Probing Factual Recall in Multimodal Language Models at Scale',
+      authors: 'Gildong Hong, Younghee Lee',
+      venue: 'arXiv preprint arXiv:2604.01234',
+      paper: 'https://arxiv.org',
+      bib: '@article{hong2026probing,\n  title={Probing Factual Recall in Multimodal Language Models at Scale},\n  author={Hong, Gildong and Lee, Younghee},\n  journal={arXiv preprint arXiv:2604.01234},\n  year={2026}\n}',
+    },
+    {
+      year: 2025, badge: 'NeurIPS 2025',
+      title: 'On the Robustness of Instruction-Tuned Models to Distribution Shift',
+      authors: 'Gildong Hong, Cheolsu Kim',
+      venue: 'The 39th Annual Conference on Neural Information Processing Systems (NeurIPS 2025)',
+      paper: 'https://arxiv.org', code: 'https://github.com',
+      bib: '@inproceedings{hong2025robustness,\n  title={On the Robustness of Instruction-Tuned Models to Distribution Shift},\n  author={Hong, Gildong and Kim, Cheolsu},\n  booktitle={NeurIPS},\n  year={2025}\n}',
+    },
+    {
+      year: 2024, badge: 'EMNLP 2024',
+      title: 'A Simple Baseline for Probing Factual Knowledge in Language Models',
+      authors: 'Gildong Hong, Younghee Lee',
+      venue: 'Empirical Methods in Natural Language Processing (EMNLP 2024)',
+      paper: 'https://arxiv.org', code: 'https://github.com',
+      bib: '@inproceedings{hong2024probing,\n  title={A Simple Baseline for Probing Factual Knowledge in Language Models},\n  author={Hong, Gildong and Lee, Younghee},\n  booktitle={EMNLP},\n  year={2024}\n}',
+    },
+  ],
+
+  education: [
+    { period: '2024 – Present', degree: 'MS–PhD Combined Program', detail: 'Artificial Intelligence, Sungkyunkwan University', extra: 'Advisor: Prof. Yulhwa Kim' },
+    { period: '2020 – 2024', degree: 'Bachelor of Science', detail: 'Computer Science, Sungkyunkwan University', extra: 'Summa Cum Laude' },
+  ],
+
+  experience: [
+    { org: 'Industry AI Lab', role: 'Research Intern', period: '2026', bullets: ['Efficient inference for long-context language models'] },
+    { org: 'EIC Lab, SKKU', role: 'Undergraduate Researcher', period: '2023 – 2024', bullets: ['LLM evaluation benchmarks', 'Interpretability tooling for transformer models'] },
+    { org: 'Sungkyunkwan University', role: 'Teaching Assistant', period: '2025 Spring', bullets: ['Introduction to Machine Learning'] },
+  ],
 
   lastUpdated: 'August 2026',
 };

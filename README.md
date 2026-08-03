@@ -1,6 +1,8 @@
 # kyounghomin.com
 
-Personal academic website of Kyoungho Min, served by GitHub Pages at [kyounghomin.com](https://kyounghomin.com).
+Personal academic website template, served by GitHub Pages at [kyounghomin.com](https://kyounghomin.com).
+
+> **Note:** currently filled with example data (*Gildong Hong* — a fictional person) for template review. All real content lives in `profile.js` and `cv.html`; swap the example values for your own.
 
 ## Structure
 

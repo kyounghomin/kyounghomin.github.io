@@ -228,8 +228,10 @@
 class Component extends DCLogic {
   state = { p: null, copiedBib: null, scroll: 0 };
   componentDidMount() {
-    // Resolve against the page URL, not support.js's directory (assets/)
-    import(new URL('profile.js', document.baseURI).href).then(m => this.setState({ p: m.default }));
+    // Resolve against the page URL, not support.js's directory (assets/).
+    // The ?v= query defeats browser/CDN caching (Cloudflare holds .js for 4h),
+    // so content edits show up on the next page load.
+    import(new URL('profile.js?v=' + Date.now(), document.baseURI).href).then(m => this.setState({ p: m.default }));
     this.onScroll = () => {
       if (this._raf) return;
       this._raf = requestAnimationFrame(() => {
@@ -306,7 +308,7 @@ class Component extends DCLogic {
         if (key === 'linkedin') return { ...l, icon: linkedinIcon };
         return { ...l, icon: icons[key] ? 'https://cdn.simpleicons.org/' + icons[key] + '/3a3f47' : '' };
       }),
-      cvHref: p.cv.file,
+      cvHref: p.cv.file + '?v=' + Date.now(),
       scrollPct: this.state.scroll,
       focusBlurb: p.focus.blurb, focusTags: p.focus.tags,
       showNews: (this.props.showNews ?? true) && p.news.length > 0,

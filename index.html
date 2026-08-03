@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kyoungho Min</title>
+<meta name="description" content="Kyoungho Min — MS–PhD student at the Efficient &amp; Intelligent Computing Lab (EIC Lab), Sungkyunkwan University. Efficient AI, multimodal models, and text-to-image generation.">
+<meta name="theme-color" content="#12305f">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="180x180" href="assets/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="assets/images/apple-touch-icon.png">
+<link rel="canonical" href="https://kyounghomin.com/">
+<meta property="og:title" content="Kyoungho Min">
+<meta property="og:description" content="MS–PhD student at EIC Lab, Sungkyunkwan University — efficient AI, multimodal models, and image generation.">
+<meta property="og:url" content="https://kyounghomin.com/">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://kyounghomin.com/assets/images/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script src="./assets/support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  body { margin: 0; background: #fbfbfc; color: #23272e; }
+  a { color: #12305f; text-decoration: none; }
+  a:hover { color: #0a1d3d; text-decoration: underline; }
+  html { scroll-behavior: smooth; }
+  @media print { .no-print { display: none; } }
+
+  /* ── Mobile refinements (inline styles need !important to yield) ── */
+  @media (max-width: 720px) {
+    .nav-inner { padding: 10px 16px !important; }
+    .nav-links { font-size: 13.5px !important; gap: 4px 14px !important; }
+    .nav-lab-label { display: none !important; }
+    .hero { flex-direction: column !important; align-items: center !important; text-align: center; padding: 32px 20px 30px !important; gap: 22px !important; }
+    .hero-info { min-width: 0 !important; width: 100%; }
+    .hero-photo { width: 170px !important; height: 170px !important; }
+    .hero-name { font-size: 27px !important; }
+    .hero-badges, .hero-links { justify-content: center !important; }
+    .hero-tagline { font-size: 16.5px !important; }
+    .page-wrap { padding-left: 20px !important; padding-right: 20px !important; }
+    .page-section { padding-top: 48px !important; scroll-margin-top: 96px !important; }
+    .section-title { font-size: 21px !important; }
+    .pub-year { flex-basis: 100% !important; font-size: 17px !important; }
+  }
+</style>
+</helmet>
+<div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 1.65;">
+
+  <nav class="no-print" style="position: sticky; top: 0; z-index: 10; background: rgba(251,251,252,0.92); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border-bottom: 1px solid #e3e5e9;">
+    <div style="height: 3px; background: #e4e8ef;">
+      <div style="height: 100%; background: #12305f; width: {{ scrollPct }}%;"></div>
+    </div>
+    <div class="nav-inner" style="max-width: 1040px; margin: 0 auto; padding: 12px 28px; display: flex; align-items: center; justify-content: space-between; gap: 10px 24px; flex-wrap: wrap;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <a href="#top" style="font-weight: 700; font-size: 15.5px; color: #23272e; white-space: nowrap;">{{ name }}</a>
+        <span style="width: 1px; height: 16px; background: #d6d9df;"></span>
+        <a href="{{ labHref }}" target="_blank" rel="noopener" style="display: flex; align-items: center; gap: 8px; font-size: 15.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #12305f; white-space: nowrap;" style-hover="color: #0a1d3d; text-decoration: none;">
+          <img src="assets/images/eic-logo.svg" alt="EIC Lab" style="height: 17px; width: auto;">
+          <span class="nav-lab-label">{{ labName }}</span>
+        </a>
+      </div>
+      <div class="nav-links" style="display: flex; align-items: center; gap: 6px 18px; font-size: 14px; letter-spacing: 0.04em; flex-wrap: wrap;">
+        <sc-if value="{{ showNews }}" hint-placeholder-val="{{ true }}"><a href="#news" style="color: #555; transition: color .15s;" style-hover="color: #12305f; text-decoration: none;">News</a></sc-if>
+        <a href="#publications" style="color: #555; transition: color .15s;" style-hover="color: #12305f; text-decoration: none;">Publications</a>
+        <sc-if value="{{ showEducation }}" hint-placeholder-val="{{ true }}"><a href="#education" style="color: #555; transition: color .15s;" style-hover="color: #12305f; text-decoration: none;">Education</a></sc-if>
+        <sc-if value="{{ showExperience }}" hint-placeholder-val="{{ true }}"><a href="#experience" style="color: #555; transition: color .15s;" style-hover="color: #12305f; text-decoration: none;">Experience</a></sc-if>
+        <a href="{{ cvHref }}" target="_blank" rel="noopener" style="background: #12305f; color: #ffffff; padding: 6px 16px; border-radius: 8px; font-size: 13.5px; font-weight: 600; transition: background .15s;" style-hover="background: #0a1d3d; color: #ffffff; text-decoration: none;">CV</a>
+      </div>
+    </div>
+  </nav>
+
+  <div id="top" style="background: #f6f7f9; border-bottom: 1px solid #e8eaee;">
+    <header class="hero" style="max-width: 1040px; margin: 0 auto; padding: 48px 28px 40px; display: flex; gap: 36px; align-items: flex-start; flex-wrap: wrap;">
+      <div style="flex: 0 0 auto;">
+        <img class="hero-photo" src="{{ photo }}" alt="Portrait of {{ name }}" style="width: 238px; height: 238px; object-fit: cover; object-position: 50% 30%; border-radius: 12px; display: block; background: #e8eaee; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
+      </div>
+      <div class="hero-info" style="flex: 1; min-width: 260px;">
+        <h1 class="hero-name" style="font-size: 34px; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.02em;">{{ name }}</h1>
+        <p style="margin: 0 0 2px; font-size: 16.5px; color: #3a3f47;">{{ role }}</p>
+        <p style="margin: 0 0 12px; font-size: 15px; color: #7a8089;">{{ affiliation }}</p>
+        <div class="hero-badges" style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+          <a href="{{ labHref }}" target="_blank" rel="noopener" style="display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #12305f;" style-hover="color: #0a1d3d; text-decoration: none;">
+            <img src="assets/images/eic-logo.svg" alt="EIC Lab" style="height: 15px; width: auto;">
+            <span>{{ labName }}</span>
+          </a>
+          <span style="width: 1px; height: 18px; background: #d6d9df;"></span>
+          <span style="display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; color: #2d6a4f;">
+            <img src="assets/images/skku-logo.png" alt="SKKU seal" style="height: 22px; width: auto;">
+            <span>SKKU</span>
+          </span>
+        </div>
+        <div class="hero-links no-print" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 18px;">
+          <a href="{{ emailHref }}" style="display: flex; align-items: center; gap: 7px; background: #f0f1f3; border: 1px solid #dfe1e5; border-radius: 8px; padding: 5px 13px; font-size: 14px; color: #3a3f47; transition: background .15s;" style-hover="background: #e5e7eb; color: #23272e; text-decoration: none;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3a3f47" stroke-width="2"><rect x="2" y="4.5" width="20" height="15" rx="2"></rect><path d="M2 7.5l10 6.5 10-6.5"></path></svg>
+            <span>{{ emailText }}</span>
+          </a>
+          <sc-for list="{{ links }}" as="l" hint-placeholder-count="0">
+            <a href="{{ l.href }}" target="_blank" rel="noopener" style="display: flex; align-items: center; gap: 7px; background: #f0f1f3; border: 1px solid #dfe1e5; border-radius: 8px; padding: 5px 13px; font-size: 14px; color: #3a3f47; transition: background .15s;" style-hover="background: #e5e7eb; color: #23272e; text-decoration: none;">
+              <sc-if value="{{ l.icon }}" hint-placeholder-val="{{ false }}"><span style="display: inline-block; width: 14px; height: 14px; background: url({{ l.icon }}) center / contain no-repeat;"></span></sc-if>
+              <span>{{ l.label }}</span>
+            </a>
+          </sc-for>
+        </div>
+        <p class="hero-tagline" style="margin: 0; font-size: 18px; color: #4a5058;">{{ tagline }}</p>
+      </div>
+    </header>
+  </div>
+
+  <div class="page-wrap" style="max-width: 1040px; margin: 0 auto; padding: 8px 28px 56px;">
+    <section class="page-section" style="padding-top: 48px;">
+      <h2 class="section-title" style="font-size: 24px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 16px; padding-bottom: 10px; border-bottom: 2px solid #12305f;">Research Focus</h2>
+      <p style="margin: 0 0 14px; max-width: 78ch; text-wrap: pretty;">{{ focusBlurb }}</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <sc-for list="{{ focusTags }}" as="t" hint-placeholder-count="4">
+          <span style="font-size: 13px; font-weight: 500; background: #eceff5; border: 1px solid #d3dae6; border-radius: 6px; padding: 3px 11px; color: #12305f;">{{ t }}</span>
+        </sc-for>
+      </div>
+    </section>
+
+    <sc-if value="{{ showNews }}" hint-placeholder-val="{{ true }}">
+    <section id="news" class="page-section" style="padding-top: 72px; scroll-margin-top: 64px;">
+      <h2 class="section-title" style="font-size: 24px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 16px; padding-bottom: 10px; border-bottom: 2px solid #12305f;">News</h2>
+      <div style="display: grid; gap: 8px;">
+        <sc-for list="{{ news }}" as="n" hint-placeholder-count="3">
+          <div style="display: flex; gap: 16px;">
+            <span style="flex: 0 0 82px; color: #999; font-size: 15px; font-variant-numeric: tabular-nums;">{{ n.date }}</span>
+            <span>{{ n.text }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+    </sc-if>
+
+    <section id="publications" class="page-section" style="padding-top: 72px; scroll-margin-top: 64px;">
+      <h2 class="section-title" style="font-size: 24px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 20px; padding-bottom: 10px; border-bottom: 2px solid #12305f;">Publications</h2>
+      <div style="display: grid; gap: 28px;">
+        <sc-for list="{{ pubYears }}" as="g" hint-placeholder-count="2">
+          <div style="display: flex; gap: 12px 20px; flex-wrap: wrap;">
+            <div class="pub-year" style="flex: 0 0 62px; font-size: 21px; color: #b9c0cb; font-weight: 700;">{{ g.year }}</div>
+            <div style="flex: 1; display: grid; gap: 22px; min-width: 0;">
+              <sc-for list="{{ g.items }}" as="p" hint-placeholder-count="2">
+                <div>
+                  <div style="font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase; color: {{ p.badgeColor }}; margin-bottom: 3px;">{{ p.badge }}</div>
+                  <div style="font-weight: 600; font-size: 17.5px; line-height: 1.4;"><a href="{{ p.paper }}" target="_blank" rel="noopener" style="color: #23272e; transition: color .15s;" style-hover="color: #12305f; text-decoration: none;">{{ p.title }}</a></div>
+                  <div style="font-size: 15.5px; color: #444; margin-top: 2px;">{{ p.authors }}</div>
+                  <sc-if value="{{ p.note }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-size: 13.5px; color: #999;">{{ p.note }}</div>
+                  </sc-if>
+                  <div style="font-size: 15px; color: #777; font-style: italic; margin-top: 2px;">{{ p.venue }}</div>
+                  <div class="no-print" style="display: flex; gap: 14px; font-size: 14px; margin-top: 5px;">
+                    <sc-if value="{{ p.paper }}" hint-placeholder-val="{{ true }}"><a href="{{ p.paper }}" target="_blank" rel="noopener">Paper</a></sc-if>
+                    <sc-if value="{{ p.code }}" hint-placeholder-val="{{ false }}"><a href="{{ p.code }}" target="_blank" rel="noopener">Code</a></sc-if>
+                    <a href="#publications" onClick="{{ p.copyBibtex }}">{{ p.bibLabel }}</a>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <sc-if value="{{ showEducation }}" hint-placeholder-val="{{ true }}">
+    <section id="education" class="page-section" style="padding-top: 72px; scroll-margin-top: 64px;">
+      <h2 class="section-title" style="font-size: 24px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 20px; padding-bottom: 10px; border-bottom: 2px solid #12305f;">Education</h2>
+      <div style="display: grid; gap: 18px;">
+        <sc-for list="{{ education }}" as="e" hint-placeholder-count="2">
+          <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <sc-if value="{{ e.period }}" hint-placeholder-val="{{ true }}">
+              <div style="flex: 0 0 140px; color: #999; font-size: 15px;">{{ e.period }}</div>
+            </sc-if>
+            <div style="flex: 1; min-width: 240px;">
+              <div style="font-weight: 600;">{{ e.degree }}</div>
+              <div style="font-size: 15.5px; color: #555;">{{ e.detail }}</div>
+              <sc-if value="{{ e.extra }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size: 15px; color: #999;">{{ e.extra }}</div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+    </sc-if>
+
+    <sc-if value="{{ showExperience }}" hint-placeholder-val="{{ true }}">
+    <section id="experience" class="page-section" style="padding-top: 72px; scroll-margin-top: 64px;">
+      <h2 class="section-title" style="font-size: 24px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 20px; padding-bottom: 10px; border-bottom: 2px solid #12305f;">Experience</h2>
+      <div style="display: grid; gap: 20px;">
+        <sc-for list="{{ experience }}" as="x" hint-placeholder-count="3">
+          <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <sc-if value="{{ x.period }}" hint-placeholder-val="{{ true }}">
+              <div style="flex: 0 0 140px; color: #999; font-size: 15px;">{{ x.period }}</div>
+            </sc-if>
+            <div style="flex: 1; min-width: 240px;">
+              <div style="font-weight: 600;">{{ x.role }}</div>
+              <div style="font-size: 15.5px; color: #555; margin-bottom: 4px;">{{ x.org }}</div>
+              <ul style="margin: 0; padding-left: 18px; display: grid; gap: 2px; font-size: 15.5px; color: #444;">
+                <sc-for list="{{ x.bullets }}" as="b" hint-placeholder-count="1">
+                  <li>{{ b }}</li>
+                </sc-for>
+              </ul>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+    </sc-if>
+  </div>
+
+  <footer style="border-top: 1px solid #e3e5e9; background: #f6f7f9; color: #8b919b;">
+    <div style="max-width: 1040px; margin: 0 auto; padding: 20px 28px; font-size: 13.5px; display: grid; gap: 4px;">
+      <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+        <span>© 2026 {{ name }}</span>
+        <span>Last updated: {{ lastUpdated }}</span>
+      </div>
+      <div><a href="{{ labHref }}" target="_blank" rel="noopener" style="color: #8b919b;" style-hover="color: #12305f;">{{ labFullName }}</a>, {{ labUniversity }}</div>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showNews&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { p: null, copiedBib: null, scroll: 0 };
+  componentDidMount() {
+    // Resolve against the page URL, not support.js's directory (assets/)
+    import(new URL('profile.js', document.baseURI).href).then(m => this.setState({ p: m.default }));
+    this.onScroll = () => {
+      if (this._raf) return;
+      this._raf = requestAnimationFrame(() => {
+        this._raf = null;
+        const el = document.documentElement;
+        const max = el.scrollHeight - el.clientHeight;
+        this.setState({ scroll: max > 0 ? Math.min(100, window.scrollY / max * 100) : 0 });
+      });
+    };
+    window.addEventListener('scroll', this.onScroll, { passive: true });
+    // Flash the target section when a nav anchor is clicked
+    this.onNavClick = (e) => {
+      const a = e.target.closest('a[href^="#"]');
+      if (!a) return;
+      const el = document.getElementById(a.getAttribute('href').slice(1));
+      if (!el || el.tagName !== 'SECTION') return;
+      document.querySelectorAll('[data-section-flash]').forEach(n => n.remove());
+      const topPad = parseFloat(getComputedStyle(el).paddingTop) || 0;
+      const pad = 20;
+      const rect = el.getBoundingClientRect();
+      const ov = document.createElement('div');
+      ov.setAttribute('data-section-flash', '');
+      ov.style.cssText = 'position:absolute;pointer-events:none;z-index:5;background:rgba(18,48,95,0.07);border-radius:10px;transition:opacity .8s ease;'
+        + 'left:' + (rect.left + window.scrollX - pad) + 'px;top:' + (rect.top + window.scrollY + topPad - pad) + 'px;'
+        + 'width:' + (rect.width + pad * 2) + 'px;height:' + (rect.height - topPad + pad * 2) + 'px;';
+      document.body.appendChild(ov);
+      setTimeout(() => { ov.style.opacity = '0'; }, 700);
+      setTimeout(() => { ov.remove(); }, 1600);
+    };
+    document.addEventListener('click', this.onNavClick);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.onScroll);
+    document.removeEventListener('click', this.onNavClick);
+    if (this._raf) cancelAnimationFrame(this._raf);
+  }
+  renderVals() {
+    const p = this.state.p;
+    if (!p) return {
+      showNews: false, showEducation: false, showExperience: false,
+      links: [], focusTags: [], news: [], pubYears: [], education: [], experience: [],
+      name: '', role: '', affiliation: '', tagline: '', emailHref: '', emailText: '', photo: '',
+      cvHref: '', focusBlurb: '', lastUpdated: '', scrollPct: 0,
+      labName: '', labFullName: '', labHref: '', labUniversity: '',
+    };
+    const email = p.emailUser + String.fromCharCode(64) + p.emailDomain;
+    const icons = { github: 'github', scholar: 'googlescholar', 'google scholar': 'googlescholar', orcid: 'orcid', x: 'x', twitter: 'x' };
+    const linkedinIcon = 'data:image/svg+xml,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="3" fill="#3a3f47"/><text x="12" y="17.5" font-family="Arial,Helvetica,sans-serif" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">in</text></svg>');
+    const years = [...new Set(p.publications.map(x => x.year))].sort((a, b) => b - a);
+    const pubYears = years.map(y => ({
+      year: y,
+      items: p.publications.filter(x => x.year === y).map((x, i) => {
+        const key = y + '-' + i;
+        return {
+          ...x,
+          badgeColor: /preprint/i.test(x.badge) ? '#8b929c' : '#12305f',
+          bibLabel: this.state.copiedBib === key ? 'Copied!' : 'BibTeX',
+          copyBibtex: (e) => {
+            e.preventDefault();
+            navigator.clipboard.writeText(x.bib || '');
+            this.setState({ copiedBib: key });
+            setTimeout(() => this.setState({ copiedBib: null }), 1500);
+          },
+        };
+      }),
+    }));
+    return {
+      name: p.name, role: p.role, affiliation: p.affiliation, tagline: p.tagline, photo: p.photo,
+      labName: p.lab.name, labFullName: p.lab.fullName || p.lab.name, labHref: p.lab.href, labUniversity: p.lab.university,
+      emailHref: 'mailto:' + email, emailText: email,
+      links: p.links.map(l => {
+        const key = l.label.toLowerCase();
+        if (key === 'linkedin') return { ...l, icon: linkedinIcon };
+        return { ...l, icon: icons[key] ? 'https://cdn.simpleicons.org/' + icons[key] + '/3a3f47' : '' };
+      }),
+      cvHref: p.cv.file,
+      scrollPct: this.state.scroll,
+      focusBlurb: p.focus.blurb, focusTags: p.focus.tags,
+      showNews: (this.props.showNews ?? true) && p.news.length > 0,
+      showEducation: p.education.length > 0,
+      showExperience: p.experience.length > 0,
+      news: p.news, pubYears, education: p.education, experience: p.experience,
+      lastUpdated: p.lastUpdated,
+    };
+  }
+}
+</script>
+</body>
+</html>

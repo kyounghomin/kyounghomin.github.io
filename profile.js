@@ -1,5 +1,6 @@
 // ── Personal website content: edit ONLY this file ──────────────────
-// Each field maps to a section on the page. An empty list hides its section.
+// Each field maps to a section on the page. An empty list hides its
+// section, and deleting an optional field entirely also works.
 // NOTE: currently filled with EXAMPLE data (Gildong Hong) for template review.
 export default {
   // Shared lab identity

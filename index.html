@@ -277,14 +277,21 @@ class Component extends DCLogic {
       cvHref: '', focusBlurb: '', lastUpdated: '', scrollPct: 0,
       labName: '', labFullName: '', labHref: '', labUniversity: '',
     };
+    // Deleted fields in profile.js just hide their section — never crash
+    const news = p.news ?? [];
+    const publications = p.publications ?? [];
+    const education = p.education ?? [];
+    const experience = p.experience ?? [];
+    const plinks = p.links ?? [];
+    const focus = p.focus ?? {};
     const email = p.emailUser + String.fromCharCode(64) + p.emailDomain;
     const icons = { github: 'github', scholar: 'googlescholar', 'google scholar': 'googlescholar', orcid: 'orcid', x: 'x', twitter: 'x' };
     const linkedinIcon = 'data:image/svg+xml,' + encodeURIComponent(
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="3" fill="#3a3f47"/><text x="12" y="17.5" font-family="Arial,Helvetica,sans-serif" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">in</text></svg>');
-    const years = [...new Set(p.publications.map(x => x.year))].sort((a, b) => b - a);
+    const years = [...new Set(publications.map(x => x.year))].sort((a, b) => b - a);
     const pubYears = years.map(y => ({
       year: y,
-      items: p.publications.filter(x => x.year === y).map((x, i) => {
+      items: publications.filter(x => x.year === y).map((x, i) => {
         const key = y + '-' + i;
         return {
           ...x,
@@ -300,23 +307,23 @@ class Component extends DCLogic {
       }),
     }));
     return {
-      name: p.name, role: p.role, affiliation: p.affiliation, tagline: p.tagline, photo: p.photo,
-      labName: p.lab.name, labFullName: p.lab.fullName || p.lab.name, labHref: p.lab.href, labUniversity: p.lab.university,
+      name: p.name ?? '', role: p.role ?? '', affiliation: p.affiliation ?? '', tagline: p.tagline ?? '', photo: p.photo ?? '',
+      labName: p.lab?.name ?? '', labFullName: p.lab?.fullName || p.lab?.name || '', labHref: p.lab?.href ?? '', labUniversity: p.lab?.university ?? '',
       emailHref: 'mailto:' + email, emailText: email,
-      links: p.links.map(l => {
+      links: plinks.map(l => {
         const key = l.label.toLowerCase();
         if (key === 'linkedin') return { ...l, icon: linkedinIcon };
         return { ...l, icon: icons[key] ? 'https://cdn.simpleicons.org/' + icons[key] + '/3a3f47' : '' };
       }),
-      cvHref: p.cv.file + '?v=' + Date.now(),
+      cvHref: (p.cv?.file ?? 'cv.pdf') + '?v=' + Date.now(),
       scrollPct: this.state.scroll,
-      focusBlurb: p.focus.blurb, focusTags: p.focus.tags,
-      showNews: (this.props.showNews ?? true) && p.news.length > 0,
-      showPublications: p.publications.length > 0,
-      showEducation: p.education.length > 0,
-      showExperience: p.experience.length > 0,
-      news: p.news, pubYears, education: p.education, experience: p.experience,
-      lastUpdated: p.lastUpdated,
+      focusBlurb: focus.blurb ?? '', focusTags: focus.tags ?? [],
+      showNews: (this.props.showNews ?? true) && news.length > 0,
+      showPublications: publications.length > 0,
+      showEducation: education.length > 0,
+      showExperience: experience.length > 0,
+      news, pubYears, education, experience,
+      lastUpdated: p.lastUpdated ?? '',
     };
   }
 }

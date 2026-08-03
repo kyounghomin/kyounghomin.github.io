@@ -33,11 +33,6 @@ export default {
     tags: ['LLM Training Dynamics', 'Interpretability', 'Robust Evaluation', 'Foundation Models'],
   },
 
-  news: [
-    { date: 'Jun 2026', text: 'Our paper on emergent abilities was selected for an oral presentation at ICML 2026.' },
-    { date: 'Mar 2026', text: 'Started a research internship at an industry AI lab.' },
-    { date: 'Sep 2025', text: 'One paper accepted to NeurIPS 2025.' },
-  ],
 
   // badge: short venue tag shown above the title (e.g. 'ICML 2026', 'Preprint')
   publications: [
